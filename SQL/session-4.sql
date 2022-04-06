@@ -121,4 +121,42 @@ listeleyen sorguyu yazınız */
  HAVING total_amount > 40
  ORDER BY total_amount DESC;
  
+ --SUBQUERY
+ 
+/*===================================================
+ SUBQUERIES
+====================================================*/
+
+/* albums tablosundaki Title sutunu 'Faceless' olan kaydın albumid'si elde ederek 
+tracks tablosunda bu değere eşit olan kayıtların bilgilerini SUBQUERY yazarak listeyiniz.
+Listelemede trackid, name ve albumid bilgilerini bulunmalıdır. */
+ 
+ SELECT TrackId, name, AlbumId
+ FROM tracks
+ WHERE tracks.AlbumId =
+	(SELECT AlbumId FROM albums WHERE Title = 'Faceless');
+
+-- alternatif yazım 
+
+SELECT TrackId, name, AlbumId
+ FROM tracks
+ WHERE tracks.AlbumId IN
+	(SELECT AlbumId FROM albums WHERE Title = 'Faceless');
+
+--JOIN ile aynı sorgu
+
+SELECT 	t.TrackId, t.name, t.AlbumId
+FROM tracks t
+JOIN albums a
+ON t.AlbumId = a.AlbumId
+WHERE a.Title = "Faceless";
+
+-- aynı sorgu aşağıdaki şekilde de yazılabilir.
+
+SELECT 	t.TrackId, t.name, t.AlbumId
+FROM tracks t
+JOIN albums a
+ON t.AlbumId = a.AlbumId AND a.Title = "Faceless";
+
+
  
