@@ -74,7 +74,6 @@ CREATE TABLE [Person].[Person_Phone](
 
 
 --cretae Person.Person_Mail table
--- ssn(sosyal güvenlik numarasýnýn unique olmasýnýn sebebi: bir kiþinin yalnýzca bir tane mail adresi olmasýdýr.
 
 CREATE TABLE [Person].[Person_Mail](
 	[Mail_ID] INT PRIMARY KEY IDENTITY (1,1),
