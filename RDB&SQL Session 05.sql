@@ -40,10 +40,16 @@ on	a.category_id = b.category_id
 group by a.category_id, b.category_name
 ;
 
+-- yukarıdaki nin aynı 
+select	a.category_id, b.category_name, count(*) CountOfProduct
+from	product.product a, product.category b
+where a.category_id = b.category_id
+group by a.category_id, b.category_name
+
 
 -- Model yılı 2016 dan büyük olan ürünlerinin liste fiyatları ortalaması 1000 den fazla olan markaları listeleyin.
 -- https://docs.microsoft.com/en-us/sql/t-sql/queries/select-having-transact-sql
-select	b.brand_name, avg(a.list_price) AS AvgPrice
+select	b.brand_name, avg(a.list_price) AS AvgPrice, avg(model_year) as modelAVG
 from	product.product a, product.brand b
 where	a.brand_id = b.brand_id
 		and a.model_year > 2016
@@ -52,13 +58,15 @@ having avg(a.list_price) > 1000
 order by 2 DESC
 ;
 
+
+
 -- Having clause içinde aggregate functionın tamamını yazmanız gerekiyor. Select bloğunda yazıldığı gibi
 -- Order by clause içinde ALIAS kullanabilirsiniz, ya da sütun sırasını da yazabilirsiniz
 
 
 --maximum list price' ı 4000' in üzerinde olan veya minimum list price' ı 500' ün altında olan categori id' leri getiriniz
 --category name' e gerek yok.
-select	category_id, max(list_price), min(list_price)
+select	category_id, max(list_price) as max_price, min(list_price) as min_price
 from	product.product
 group by category_id
 having max(list_price) > 4000 or
@@ -89,11 +97,11 @@ order by 1, 2
 ;
 
 
--- rollup
+-- rollup sırayla birden fazla gruplama yapar
 select	category_id, model_year, count(*) CountOfProducts
 from	product.product
 group by 
-	rollup (category_id, model_year)
+	rollup (category_id, model_year) -- önce kategori ye göre sonra model yılına göre guruplandırma(yada sıralama) yapar.
 ;
 
 select	category_id, brand_id, model_year, count(*) CountOfProducts
@@ -103,7 +111,7 @@ group by
 ;
 
 
--- cube
+-- cube mümkün olan tüm gruplamaları sağ sütündan başlayarak yapar.
 select	brand_id, category_id, model_year, count(*) CountOfProducts
 from	product.product
 group by 
