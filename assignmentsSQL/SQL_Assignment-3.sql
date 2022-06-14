@@ -55,6 +55,6 @@ SELECT A.Adv_Type, conversion_rate, Adv_count
 FROM conversion_count A, num_ADV B
 WHERE A.Adv_Type = B.Adv_Type
 
-SELECT Adv_Type, conversion_rate * 100 / Adv_count as Conversion_Rate
+SELECT Adv_Type, cast(conversion_rate * 1.0 / Adv_count  as decimal (3,2)) as Conversion_Rate
 from CONVER
 
