@@ -136,7 +136,7 @@ SELECT CONVERT(VARCHAR(10), GETDATE(), 6)
 --VARCHAR TO DATE
 
 
-SELECT CONVERT(DATE, '24 Jun 22' , 6)
+SELECT CONVERT(DATE, '04 Jun 22' , 6)
 
 
 SELECT CONVERT(DATETIME, '04 Jun 22' , 6)
@@ -172,7 +172,7 @@ SELECT DATEDIFF(SECOND, '2022-05-10', GETDATE())
 
 ---
 
---Teslimat tarihi ile kargolama/teslimat tarihi arasï¿½ndaki gï¿½n farkï¿½nï¿½ bulunuz.
+--Teslimat tarihi ile kargolama/teslimat tarihi arasýndaki gün farkýný bulunuz.
 
 SELECT	*, DATEDIFF(DAY, order_date, shipped_date) Diff_of_day
 FROM	sale.orders
@@ -254,8 +254,6 @@ SELECT SUBSTRING('CHARACTER', 3, 5)
 
 SELECT SUBSTRING('CHARACTER', 4, 9)
 
-SELECT UPPER (SUBSTRING('clarusway.com', 0 , CHARINDEX('.','clarusway.com')));
-
 ---
 
 --LOWER, UPPER, STRING_SPLIT
@@ -275,7 +273,7 @@ FROM STRING_SPLIT('jack,martin,alain,owen', ',')
 ----
 
 
----'character' kelimesinin ilk harfini bï¿½yï¿½lten bir script yazï¿½nï¿½z.
+---'character' kelimesinin ilk harfini büyülten bir script yazýnýz.
 
 
 SELECT UPPER ('character')
@@ -286,19 +284,13 @@ SELECT UPPER (LEFT('character', 1))
 
 SELECT SUBSTRING('character', 2, 9)
 
-SELECT SUBSTRING('Clarusway', -5, 10) AS substr
-
-SELECT SUBSTRING('Clarusway', -5, 3) AS substr
-
-SELECT SUBSTRING('Clarusway', -1, 3) AS substr
-
 select LEN('character')
 
 
 SELECT LOWER (SUBSTRING('character', 2, LEN('character')))
 
 
---SONUï¿½
+--SONUÇ
 SELECT UPPER (LEFT('character', 1)) + LOWER (SUBSTRING('character', 2, LEN('character')))
 
 
@@ -310,4 +302,3 @@ SELECT CONCAT (UPPER(LEFT('character', 1)) , LOWER (SUBSTRING('character', 2, LE
 
 
 
-SELECT CHARINDEX('r', 'Reinvent yourself') AS motto;
