@@ -1,267 +1,406 @@
-#%% SQL-3. ders_03.06.2022_ LAB DERSI
+#%% 4.Ders 04.06.2022_ 
+# Dersin 1. bölümü
+# Bugün konumuz fonksiyonlar
 
-# Insertten devam edeceğiz bu gün
-# Insert: Tabloya veri girmemizi sağlıyordu
+# Table of Contents
+# 1. Date functions
+# 2. String functions
+# 3. Other functions 
 
-########################################################################
-# INSERT / INSERT INTO ...
+#%%
+# Temel kavramları bize hatırlayalım
 """
-INSERT INTO Person.Person (SSN, Person_FirstName, Person_LastName) VALUES (75056659595,'Zehra', 'Tekin')
+# /*     */  : Yorum açmak için kullanılır .
+# iki tire ard arda(--) : Bu da yorum açmak için kullanılır
 
-# SSN, Person_FirstName, Person_LastName e 75056659595,'Zehra', 'Tekin' değerlerini ekledim
-# INSERT yerine INSERT INTO yazabilirdik
+/* SELECT
+FROM
+WHERE 
+ORDER BY
+TOP
+    */ 
 """
-####################################
-"""
-INSERT INTO Person.Person  VALUES (889623212466,'Kerem',"Yılmaz")
-
-# Sütun ismi yazmazsam tüm sütunlara insert edecek
-"""
-####################################
-"""
-INSERT INTO Person.Person  VALUES (889623212466,'Kerem')
-
-# HATA, 3 sütun, 2 değer var
-"""
-####################################
-"""
-INSERT INTO Person.Person (SSN, Person_FirstName) VALUES (889623212466,'Kerem')
-
-# Kabul etti çünkü  Person_LastName sütunu "NULL" olabiliyordu
-# Eğer "NOT NULL" constraint i olsaydı çalışmazdı
-# Diğer bir nokta integer a nümerik, varchar sütuna string değer girmeliyiz
-"""
-####################################
-"""
-INSERT INTO Person.Person (Person_LastName,SSN, Person_FirstName) VALUES ("Yalnız",889623212466,'Ahmet')
-
-# Sütun sırasını değiştirebilirim ama values sırasını da değiştirmeliyim
-# HATA: primary key olan satıra aynı değeri bu unique değer olmalı, yukarda girdin aynısını diyor
-# Bunu değiştirirsek hata düzelecektir -- Örn: 639623212466
-"""
-####################################
-"""
-INSERT INTO Person.Person (SSN, Person_FirstName, Person_LastName) VALUES (459623212466, "Zeki",Null)
-
-# Insert edeceğiniz sütunları yazmazsak bütün sütunlara değer ekleyeceğimizi anlar SQL
-"""
-####################################
-"""
-INSERT INTO Person.Person  VALUES (459623264466, "Zeki",Null)
-INSERT INTO Person.Person VALUES (459652212466, "Metin",Null)
-
-# İki kayıt yapabiliriz bu şekilde ya da tek query de yapabiliriz bunu ; aşağıya bakalım
-"""
-####################################
-"""
-INSERT INTO Person.Person  VALUES (459623264466, "Zeki",Null),
-                                  (459652212466, "Metin",Null)
-"""
-####################################
-"""
-INSERT INTO Person.Person_Mail (Mail, SSN) VALUES ('zehtek@gmail.com',75056659595),
-                                  ('meyet@gmail.com',13056659595),
-                                  'metsak@gmail.com',24056659595)
-
-# Mail_ID identity(1,1) constraint ine sahip olduğu için buna değer girmeye çalışırsak hata alırız
-# O yüzden bu sütunu almadık
-"""
-####################################
-"""
-INSERT INTO Person.Person_Mail VALUES ('zehtek@gmail.com',75056659595),
-                                  ('meyet@gmail.com',15076659595),
-                                  'metsak@gmail.com',24056659595)
-
-# Peki sütun isimlerini yazmazsam? Kabul eder mi? Etti.
-"""
-
-########################################################################
-# SELECT .... INTO
-####################################
-"""
-SELECT * FROM Person.Person  # 7 değer girmişiz.
-"""
-####################################
-"""
-SELECT * INTO person.person_2 from Person.Person
-
-# Person tablosunun tamamını person_2 tablosuna kopyala
-# person_2 tablosu yoktu, artık var altta
-"""
-####################################
-"""
-SELECT * FROM person.person_2
-"""
-############################################################################################################
-# INSERT INTO SELECT : Bir tabloya farklı bir query nin sonucunda gelen değerleri insert etmemize yarıyor
-"""
-INSERT person.person_2 SELECT * FROM person.person WHERE Person_FirstName = 'Zeki'
-
-# Primary key olmadığı için 2 tane kayıt geldi person_2 ye
-"""
-####################################
-# DEFAULT VALUES null olabilen sütun için NULL, otomatik artan için sıradaki değeri ata
-"""
-INSERT Book.Publisher DEFAULT VALUES
-
-# Publisher_ID otomatik artan, Publisher_Name Null değer alabiliyor
-
-SELECT * FROM Book.Publisher
-
-# Eklenmiş
-"""
-####################################
-# UPDATE : Değerleri güncellemek için kullanılır
-"""
-UPDATE person.person_2 SET Person_FirstName = 'Default_name'
-
-# Üsttekini çalıştıralım. (Genelde bu şekilde kullanmıyoruz)
-
-SELECT * from person.person_2 
-"""
-####################################
-"""UPDATE person.person_2 SET Person_FirstName = 'Ahmet'
-WHERE Person_lastName = 'Yalnız'
-"""
-########################################################################
-# HOCA: join ve subquery konularına şimdilik girmeyeceğiz
-# DELETE : 
-"""
-SELECT * FROM Book.Publisher
-DELETE FROM Book.Publisher
-"""
-####################################
-"""
-Insert Book.Publisher values ('İLETİŞİM')
-
-SELECT * FROM Book.Publisher
-"""
-####################################
-"""
-DELETE FROM Book.Publisher WHERE Publisher_Name = 'İLETİŞİM'
-
-# Üstte insert ettiğimiz değer gitmiş oldu
-"""
-########################################################################
-# DROP TABLE: Verileri ile birlikte tablo gider
-"""
-DROP TABLE Person.person_2
-"""
-########################################################################
-# TRUNCATE : Tabloya format atar. Tabloyu silmez. İçindeki veriler gider
-"""
-TRUNCATE TABLE Person.Person_Mail;
-TRUNCATE TABLE Person.Person;
-TRUNCATE TABLE Book.Publisher;
-"""
-########################################################################
-# ALTER: Veritabanındaki verilerin yapısını değiştirir
-"""
-ALTER TABLE book.book ADD CONSTRAINT FK_Author FOREIGN KEY (Author_ID)
-REFERENCES book.author (Author_ID)
-
-# HATA: reference tablosunda primary key yok diyor.
-# Author tablosunda kısıt var mıydı? foreing key olabilecek hiç bir durum yok
-# .. Önce bunu düzelteceğiz -- ALTTA
-
-# book.book tablosunu yenileyeceğim
-# FK_Author : Constraint e verdiğimiz isim
-# FOREIGN KEY   : Hangi sütuna foreign key uygulayacağım --> Author_ID 
+# Yukarıdaki komutları yavaş yavaş kullanacağız
+# Sample Retail database in de çalışacağız
 
 """
-####################################
-"""
-ALTER TABLE Book.Author ADD CONSTRAINT pk_author PRIMARY (Author_ID)
+# Brand tablomuza bakalım
 
-# HATA .null olabilen bir sütunu primary key yapamazsın diyor
-# Book.Author tablosundaki Author_ID sütunun tipini değiştirmeliyiz
-"""
-####################################
-"""
-ALTER TABLE Book.Author ALTER COLUMN Author_ID INT NOT NULL
+SELECT * FROM product.brand
+ORDER BY brand_name
 
-# Şimdi tekrar çalıştıralım kodumu altta
+# 2 sütun , 40 satırlık veri var. Bunu istediğimiz sıraya koyduk ORDER BY ile (Ascending)
+"""
+######################
+"""
+SELECT * FROM product.brand
+ORDER BY brand_name DESC
 
-ALTER TABLE book.book ADD CONSTRAINT FK_Author FOREIGN KEY (Author_ID)
-REFERENCES book.author (Author_ID)
+# Bu da azalan şekilde
+"""
+######################
+# TOP
+"""
+SELECT TOP 10 * FROM product.brand
+ORDER by brand_id DESC
 
-# Şu an oldu. Author_ID yi foreign key yaptık
+# Büyük tablolarda TOP 10 kullanırız, pandastaki head() gibi düşünebiliriz
 """
-####################################
-# Diagrama bakıyorum henüz bir bağlantı oluşmuş görünmüyor
-# HOCA: Author tablosunda primary key neden görünmüyor? Sonra kapatıp açıp tekrar bakarız
+######################
+# WHERE : Istediğim kriterler için koşul gireceğim
+"""
+SELECT * FROM product.brand
+WHERE brand_name LIKE 'S%'
+
+# S%: brand_name i S ile başlayan satırları getir
+"""
+######################
+"""
+# product tablosuna bakalım
+
+# product_id --> primary key -> 1.Unique 2.Non-Null
+# product_name --> aynı isme sahip productlar var -- ÖRN: satır 409-410-411
+# Ama bunlar farklı ID ile ifade edilmiş
+# List price ları farklı olduğu için farklı ID ile ifade edilmiş
+# Farklı nedenlerden dolayı da olabilir
+
+# Brand_id ve category_id var yine tables- columns- altında
+# Bunlarında foreign key olduğunu biliyoruz
+"""
+######################
+"""
+SELECT * FROM product.product
+WHERE model_year BETWEEN 2019 AND 2021
 
 """
-# Publisher_Id yi de foreign key yapmalıyım
+######################
+"""
+# Çok büyük tablolarda min ya da max değeri görmez için ORDER BY ASC/DESC kullanabiliriz
 
-ALTER TABLE Book.Book ADD CONSTRAINT FK_Publisher FOREIGN KEY (Publisher_ID)
-REFERENCES Book.Publisher (Publisher_ID) 
+SELECT TOP 1 * FROM product.product
+WHERE model_year BETWEEN 2019 AND 2021
+ORDER BY model_year DESC
 
-# Publisher_ID de foreign key oldu
 """
-####################################
+######################
 """
-ALTER TABLE Person.Loan ADD CONSTRAINT FK_PERSON FOREIGN KEY (SSN)
-REFERENCES Person.Person (SSN) 
-ON UPDATE NO ACTION
-ON DELETE NO ACTION
+SELECT * FROM product.product
+WHERE category_id IN (3,4,5)
 
-# ON UPDATE  : ana tabloda update yaptığımda NO ACTION yapsın
-# ON DELETE  : ana tabloda delete yaptığımda NO ACTION yapsın
+# 3 numaralı ya da 4 numaraları ya da 5 numaralarınu alan category_id yi getirdik
 """
-####################################
+######################
 """
-ALTER TABLE Person.Loan ADD CONSTRAINT FK_book FOREIGN KEY (Book_ID)
-REFERENCES Book.Book (Book_ID) 
-ON UPDATE NO ACTION
-ON DELETE CASCADE
-"""
-########################################################################
-# CHECK CONSTRAINT
-"""
-SELECT * FROM person.Person
+# 2. yol . Üstteki ile aynı çıktı gelecek
 
-# person.Person SSN sütununa 11 haneden fazla rakam giremesin kullanıcı. Bunu yapmaya çalışalım
-"""
-####################################
-"""
-ALTER TABLE person.person ADD CONSTRAINT CHECK_SSN CHECK (SSN > 9999999999 AND SSN <=99999999999)
+SELECT * FROM product.product
+WHERE category_id=3 OR ategory_id=4 OR ategory_id=5
 
-# Şimdi altta SSN e 7 digitli değer girmeye çalışalım
 """
-####################################
+######################
 """
-INSERT Person.Person (SSN) VALUES (8989565)
+# Yukardakiler için 3,4,5 in haricindekiler
 
-# HATA
+SELECT * FROM product.product
+WHERE category_id NOT IN (3,4,5)
 """
-####################################
+######################
+"""SELECT * FROM product.product
+WHERE category_id NOT IN (3,4,5)
 """
-INSERT Person.Person (SSN) VALUES (89895658572)
+######################
+"""
+# 2. yol . Üstteki ile aynı çıktı gelecek
 
-# Hata YOK
-"""
-####################################
-"""
-Alter table Person.Person_Phone add constraint FK_Person2 Foreign key (SSN) References Person.Person(SSN)
-"""
-####################################
-"""
-Alter table Person.Person_Mail add constraint FK_Person4 Foreign key (SSN) References Person.Person(SSN)
-"""
-# Hemen hemen bütün constraintlerimizi oluşturduk. Bakalım Database diagramlarımız oluşmuş mu
-# Tüm tablolar birbiri ile bağlantılı
-# Loan -- SSN üzerinde - person a bağlı , aynı zamanda book_Id üzerinden Book tablosuna bağlı
-# Book --- Publisher_ID üzerinden Publisher a bağlı ve Author_ID üzerinden Author a bağlı
-# O sayfada sağ tık -- > properties -- dediğimde ne olduğu ile ilgili bilgi veriyor
-# relationships e tıklayıp bağlantıları da görebiliriz
+SELECT * FROM product.product
+WHERE category_id <> 3 AND ategory_id <> 4 AND ategory_id <> 5
 
-# MSSQL Türkçe karakterlerde hata veriyorsa
-# Tools--> Options --> (açılan yerde sol üst arama yerine language yazıyoruz), --> language --> same as windows
+<> : "Eşit değildir" anlamında , Ayrıca
+!= : "Eşit değildir" anlamında bu da
+"""
+######################
+"""
 
-# Şemalar:
-# Hoca: Şemalar tabloları birbirinden ayırmak, onları ayrı yetkilendirme yapabilmek için Şema yapıyorsunuz
-# ... Bazı şemalara yetki verip bazılarına yetki vermiyoruz vs
+SELECT * FROM product.stock
+
+# Bu tablo neyi anlatıyor bana? Store ile product ın ilişkisi
+# Hangi mağaza hangi ürünün stock u var
+# Primary key hangi sütun olmalı ? 
+# store_id ve product_id birlikte primary key olmalı
+# Çünkü store_id ve quantity yi yanyana koysam bu iki sütun net bir bilgi veremiyor
+# product_id ile quantity yi yanyana koysam 1. numaraları product ın quantitileri farklı ama net bir bilgi
+# .. alamıyorum yine. product_id neden çoklamış, quantity neyin miktarı vs? Bu tabloyu okuyamıyoruz böyle
+# .. O yüzden 2 sütun(product_id, store_id) bir olup composite primary key oldu
+"""
+
+#%% # Dersin 2. bölümü
+##################################################################
+# Date Functions
+"""
+Data types
+time              : saat verisi varsa
+date              : tarih verisi varsa
+smalldatetime     : tarih ve saat verisi birlikte
+datetime          : tarih ve saat verisi birlikte
+datetime2         : tarih ve saat verisi birlikte
+datetimeoffset
+
+"""
+######################
+# GETDATE() : Sisteminizin o anlık saatini datetime data tipinde getirir
+"""
+CREATE TABLE t_date_time (
+	A_time time,
+	A_date date,
+	A_smalldatetime smalldatetime,
+	A_datetime datetime,
+	A_datetime2 datetime2,
+	A_datetimeoffset datetimeoffset
+	)
+
+# "t_date_time isminde" bir tablo oluşturduk
+# 6 tane sütunu var. Her sütunun veritipi fatklı
+# Şimdi inceleyelim
+"""
+######################
+"""
+SELECT * from t_date_time
+
+# Şu an boş. 
+
+SELECT GETDATE() as get_date
+# Tarih saat ve nanosecond sonuç döndürdü
+
+# Insert yapalım yukarda oluşturduğumuz tabloya
+
+INSERT t_date_time
+VALUES (GETDATE(),GETDATE(),GETDATE(),GETDATE(),GETDATE(),GETDATE())
+
+# Her bir sütun için GETDATE() insert ettik
+# Her sütun kendi veritipine uygun şekilde yazdırdı
+"""
+######################
+"""
+INSERT t_date_time (A_time, A_date, A_smalldatetime, A_datetime, A_datetime2, A_datetimeoffset)
+VALUES
+('12:00:00', '2021-07-17', '2021-07-17','2021-07-17', '2021-07-17', '2021-07-17' )
+
+# "time" formatına uygun şekilde values un ilk değerini saat şeklinde yazdık, diğerlerine sadece tarih girelim
+# Kendi formatlarına uygun çıktı getirdiler yine
+"""
+#######################
+# Farklı ülkelerin veya farklı kullanım amaçlarına göre tarih stillleri var
+# Her bir stilin kodu var (1,2,3,4,5,6,7,(8 veya 108))
+# Verinizdeki tarih formatı bize uygun değilse bu still ile değiştirebiliriz.
+# Örnek yapalım
+"""
+SELECT CONVERT(VARCHAR, GETDATE(), 6)   # GETDATE() i varchar a dönüştürdük. Still kodu 6 yani burada 6 görmek istediğimiz format
+
+SELECT CONVERT(DATE, '25 Oct 21', 6)    # Varchar ı date e dönüştürdük
+"""
+#######################
+"""
+# Farka bakalım dönüştürmeden önce ve sonra
+
+SELECT GETDATE()
+SELECT CONVERT (VARCHAR(10), GETDATE(), 6)
+
+# target_dtype : (VARCHAR(10) : Veri tipi
+# GETDATE()    : Dönüştürmek istediğim değer
+# 6            : "Date only format tablosundaki" Dönüştürmek istediğim stil no 
+"""
+#######################
+"""
+SELECT CONVERT(DATE, '25 Oct 21', 6) 
+
+# target_dtype : DATE : Veri tipi
+# '25 Oct 21'  : Dönüştürmek istediğim değer
+# 6            : "Date only format tablosundaki" Dönüştürmek istediğim stil no 
+"""
+# NOT: convert ü varchar ı integer a ya da integer ı varchar a convert etmek için kullanıyoruz
+
+############################################
+# Return Date or Time Parts
+# Date ten istediğimiz parçaları alacağız
+"""
+FUNCTION         SYNTAX                         RETURN DATA TYPE
+------------------------------------------------------------------
+DATENAME        DATENAME(datepart, date)           nvarchar
+DATEPART        DATEPART(datepart, date)            int
+DAY             DAY(date)                           ...
+MONTH           MONTH(date)                         ...
+YEAR            YEAR (date)                         ...
+"""
+########################
+"""
+SELECT A_DATE
+		, DAY(A_DATE) DAY_
+		, MONTH(A_DATE) [MONTH]
+		, DATENAME(DAYOFYEAR, A_DATE) DOY
+		, DATEPART(WEEKDAY, A_date) WKD
+		, DATENAME(MONTH, A_DATE) MON
+FROM t_date_time
+
+# Burada fonksiyonlar (Python daki built-in gibi olduğu için) isim verirken DAY sonuna alt tire
+# .. ya da MONTH u köşeli parantez içine alarak fonksiyon rengi pembeye dönmeden sütuna bu şekilde
+# .. isim atayabiliriz)
+"""
+################################################
+# Return Date and Time Difference Values
+# DATEDIFF: 2 zaman arasındaki farkı alacağız(gün farkı, dakika farkı, saat farklı vs)
+"""
+FUNCTION         SYNTAX                                      RETURN DATA TYPE
+------------------------------------------------------------------
+DATEDIFF        DATEDIFF(datepart, startdate, enddate)            int
+"""
+########################
+"""
+SELECT DATEDIFF(DAY,'2022-05-10',GETDATE())
+
+# şu anki zaman ile 2022-05-10 arasındaki güm farklı nı
+"""
+########################
+"""
+SELECT DATEDIFF(SECOND,'2022-05-10',GETDATE())
+"""
+################################################
+# Modify Date And time values
+
+"""
+FUNCTION         SYNTAX                                      RETURN DATA TYPE
+------------------------------------------------------------------
+DATEADD    DATEADD(datepart, number, date)     the date type of the date argument 
+EOMONTH    EOMONTH(start_date [,month_to_add]) return type is the type of the start_date argument, or alternately, the date data type
+
+# DATEADD : belirtiğimiz zamana eklemek istediğimiz değer
+# EOMONTH : ayın son gününü verir
+# Örnek yapalım
+"""
+########################
+"""
+SELECT DATE(DAY,5,GETDATE())     # Bu günden itibaren 5 gün ekledi
+SELECT DATE(MINUTE,5,GETDATE())
+"""
+########################
+"""
+SELECT EOMONTH(GETDATE())
+SELECT EOMONTH(GETDATE(),2)
+
+# Bulunduğumuz aydan, 2 ay sonrasının, son günü
+"""
+########################
+"""
+# Veritabanımızdan örnek yapalım
+
+SELECT * FROM sale.orders
+
+# Burada bazı tarihler var burada
+"""
+
+#%% Dersin 3. bölümü
+########################
+"""
+# Her bir sipariş için sipariş tarihi ve kargolama tarihi arasındaki farkı GÜN cinsinden bulalım
+
+SELECT *, DATEDIFF(DAY, order_date, shipped_date) Diff_of_day
+FROM sale.orders
+"""
+########################
+"""
+# Her bir sipariş için sipariş tarihi ve kargolama tarihi arasında 2 günden fazla geçenler
+
+SELECT *, DATEDIFF(DAY, order_date, shipped_date) Diff_of_day
+FROM sale.orders
+WHERE DATEDIFF(DAY, order_date, shipped_date) > 2
+
+# 463 rows geldi
+"""
+########################
+"""
+SELECT *
+FROM sale.orders
+WHERE DATEDIFF(DAY, order_date, shipped_date) > 2
+
+# Böyle yapsaydık Diff_of_day sütunu gözükmezdi ama kod çalışırdı
+# Tekrardan 463 rows
+"""
+
+#########################################################
+# Bir ifadenin gün formatına uygun olup olmadığına bakar
+"""
+FUNCTION         SYNTAX    
+ISDATE           ISDATE(EXPRESSION)
+"""
+
+#########################################################
+# STRING FUNCTIONS
+# 1.Character strings Data types
+# 2.String functions
+# 3.Related Topics
+
+# String functions
+# LEN(input_string)                          : karakter  uzunluğu
+# CHARINDEX(substring, string[,start_location])   : Karakterin indexi, örn: ahmet te "H" harfi kaçıncı karakter
+# PATINDEX('%pattern%', input_string)        : Bir patern aradığımız zaman örn: Bir sütunda "h" ve "m" harflerinin yan yana olduğu pattern i aramak istersek
+
+"""
+SELECT LEN ('CHARACTER ')                # Output : 10  # çünkü boşluk var burada onu da karakter olarak sayıyor
+SELECT CHARINDEX('R','CHARACTER')        # Output : 4   # Kelime içerisinde "r" nin indexini bulalım 
+SELECT CHARINDEX('R','CHARACTER',5)      # Output : 9   # Saymaya 5 ten başla. 5 ten başladığı için ilk "R" yi atladı ve ikinci "R" nin indexini yazdı
+SELECT CHARINDEX('RA','CHARACTER',5)
+SELECT CHARINDEX('RA','CHARACTER',5) -1  # Output : 9: # Saymaya 5 ten başla. (Aslında) burada 2. "R" den bir önceki karakterin index numarasını getirdi
+SELECT PATINDEX('%R', 'CHARACTER')       # Output : 9 # R ile biterse "R" nin indexi
+SELECT PATINDEX('%H%', 'CHARACTER')      # Output : 2
+SELECT PATINDEX('%A%', 'CHARACTER')      # İlk A yı aldık(2 tane A var)
+SELECT PATINDEX('__A______', 'CHARACTER') # A dan önce 2, A dan sonra 6 karakter olan bir pattern var mı?
+SELECT PATINDEX('__A%', 'CHARACTER')      # Output : 1
+SELECT PATINDEX('____A%', 'CHARACTER')    # Output : 1  
+SELECT PATINDEX('%A____', 'CHARACTER')    # Output : 5   # 2. A nın indexini getirdi
+# %R  : Burada yüzde; sayısını bilmediğim kadar karakter
+# NOT: charindex fonksiyonunda indexlemeye 1 den başlıyor
+"""
+
+######################################
+# LEFT()      : Soldan istediğimiz kadar karakter almamıza yarar
+# RIGHT()     : Sağdam istediğimiz kadar karakter almamıza yarar
+# SUBSTRING() : BAşlangıç ve bitiş karakterini vererek  sağdan,soldan veya ortadan istediğimiz kadar karakter almamıza yarar
+
+"""
+SELECT LEFT('CHARACTER',3)
+SELECT RIGHT('CHARACTER',3)
+SELECT SUBSTRING('CHARACTER',3,5)  # Output: ARACT  # 3 ten başla , 5 karakter al
+SELECT SUBSTRING('CHARACTER',4,9)  # Output: RACTER # 4 ten başla, 9 karakter al(ama 4 ten sonra 9 karakter alamadığı için sonuna kadar aldı)
+
+"""
+
+######################################
+# LOWER()      : Küçük harfe döndürür
+# UPPER()      : Büyük harfe döndürür
+# STRING_SPLIT : A table-value function: Öncekiler(Yukarıdakiler) tek bir değer döndürüyordu, A table-value function bir tablo döndürecek
+
+"""
+SELECT LOWER('CHARACTER')   # output : character
+SELECT UPPER('character')   # output : CHARACTER
+SELECT * FROM STRING_SPLIT('jack,martin,alain,owen', ',')              # Buradaki her bir ismi tek bir sütunda tablo kaydı olarak döndürdük
+SELECT value FROM STRING_SPLIT('jack,martin,alain,owen', ',')          # value ile de tablonun değerlerini yakalayabiliriz
+SELECT value as name FROM STRING_SPLIT('jack,martin,alain,owen', ',')  # sütun ismi "name" oldu
+
+# NOT: Burada virgül: "ayırt edici değer"
+"""
+
+"""
+# ÖRNEK : 'character' kelimesinin ilk harfini büyüten bir script yazınız
+
+SELECT UPPER(LEFT('character',1))+(RIGHT('character',8))
+SELECT UPPER(LEFT('character',1)) + LOWER(SUBSTRING('character',2,9))  # Eğer burda tek string yerine bir sütun olsaydı,
+# ..  9 yerine her bir string için farklı değer girmem gerekirdi. Çözüm;
+SELECT UPPER(LEFT('character',1)) + LOWER(SUBSTRING('character',2,LEN('character')))
+# Concat ile bakalım
+SELECT CONCAT UPPER(LEFT('character',1)) , LOWER(SUBSTRING('character',2,LEN('character')))
+# DIKKAT: Arada artı yerine virgül var burada
+"""
+
+################################################ END ########################################################
 
 
-###################################################### END ##############################################
+

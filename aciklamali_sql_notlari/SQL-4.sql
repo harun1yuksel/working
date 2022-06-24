@@ -1,406 +1,272 @@
-#%% 4.Ders 04.06.2022_ 
-# Dersin 1. bölümü
-# Bugün konumuz fonksiyonlar
+#%% SQL-5. ders_06.06.2022_ LAB DERSI
 
-# Table of Contents
-# 1. Date functions
-# 2. String functions
-# 3. Other functions 
+# Bugün ders planımız:
+# 1.Built-in functions (kalınan yerden devam)
+# 2.Joins & Views
+# Sample Retail üzerinde çalışacağız
 
-#%%
-# Temel kavramları bize hatırlayalım
+#%%  # DERSIN 1. BÖLÜMÜ
+##############################################################
+# TRIM(), LTRIM(), RTRIM()
+# TRIM fonksiyonu: Özellikle text datalarda bir hücredeki girdinin bazen başında ya da sonunda boşluklar olabiliyor
+# .. Bunlar bazen eşitlemede, sorguda ya da join vs yaparken sorun çıkartabiliyor.
+# O yüzden verideki başında ve sonundaki boşlukları temizleyen fonksiyondur bu
+# LTRIM(): Sadece solundaki boşlukları siler
+# RTRIM(): Sadece sağdaki boşlukları siler
 """
-# /*     */  : Yorum açmak için kullanılır .
-# iki tire ard arda(--) : Bu da yorum açmak için kullanılır
-
-/* SELECT
-FROM
-WHERE 
-ORDER BY
-TOP
-    */ 
+     Function Syntax                                                Description
+TRIM([removed_characters, from] input_string)   ---->   Return a new string from a specified string after removing all leading and trailing blanks or characyers
+LTRIM(input_string)                             ---->   Return a new string from a specified string after removeing all leading blanks
+RTRIM(input_string)                             ---->   Return a new string from a specified string after removeing all trailing blanks
 """
-# Yukarıdaki komutları yavaş yavaş kullanacağız
-# Sample Retail database in de çalışacağız
 
 """
-# Brand tablomuza bakalım
-
-SELECT * FROM product.brand
-ORDER BY brand_name
-
-# 2 sütun , 40 satırlık veri var. Bunu istediğimiz sıraya koyduk ORDER BY ile (Ascending)
+SELECT ' CHARACTER';
+# CHARACTER yazısının başında boşluk var, çıktıda hala görünüyor
 """
 ######################
 """
-SELECT * FROM product.brand
-ORDER BY brand_name DESC
-
-# Bu da azalan şekilde
-"""
-######################
-# TOP
-"""
-SELECT TOP 10 * FROM product.brand
-ORDER by brand_id DESC
-
-# Büyük tablolarda TOP 10 kullanırız, pandastaki head() gibi düşünebiliriz
-"""
-######################
-# WHERE : Istediğim kriterler için koşul gireceğim
-"""
-SELECT * FROM product.brand
-WHERE brand_name LIKE 'S%'
-
-# S%: brand_name i S ile başlayan satırları getir
+SELECT TRIM(' CHARACTER');
+# CHARACTER yazısının başında boşluk var, çıktıda gitti
+# Bu sorgu Tablolarda kalıcı değişiklik yapmaz(Select ile kullandığım için. Update, Delete vs de kalıcı değişiklik oluyordu)
 """
 ######################
 """
-# product tablosuna bakalım
+SELECT GETDATE();
+# Sistem tarihi ve zamanını getiriyor
+"""
+######################
+# sampleretail -- Programmability--functions-system functions -- string functions
+# Burada çıkanlar tanımlanmış fonksiyonlardır, en alt satırlarda TRIM fonksiyonunu görüyoruz
+# .. SQL server içerisinde bu TRIM tanımlanmış
+# Parameters : Varchar bir değer döndürür
 
-# product_id --> primary key -> 1.Unique 2.Non-Null
-# product_name --> aynı isme sahip productlar var -- ÖRN: satır 409-410-411
-# Ama bunlar farklı ID ile ifade edilmiş
-# List price ları farklı olduğu için farklı ID ile ifade edilmiş
-# Farklı nedenlerden dolayı da olabilir
+"""
+# Başka örnekler
+SELECT TRIM(' CHARACTER ')
+SELECT TRIM(        '       CHAR ACTER ')  # Tek tırnaktan önce yazılan boşlukların anlamı yok, tırmaktan sonra text ifadenin başladığını biliyor fonksiyon
 
-# Brand_id ve category_id var yine tables- columns- altında
-# Bunlarında foreign key olduğunu biliyoruz
+"""
+# TRIM in başka bir kullanımına bakacağız;
+"""
+SELECT TRIM('X' FROM 'ABCXXDE')             #  Output  : ABCXXDE
+SELECT TRIM('X' FROM 'XXXXXXXABCXXDEXXXXX') #  Output  : ABCXXDE
+# Yani baş ve sona bakıyor sadece
+"""
+
+"""
+SELECT TRIM('ABC' FROM 'CCCCBBBAAAFRHGKDFKSLDFJKSDFACBBCACABACABCA') # Output : FRHGKDFKSLDFJKSDF
+# 'ABC' : Hem A yı Hem B yi Hem C yi kes diyoruz burada
+"""
+# ARA NOT: Db oluştururken database in case sensitive olup olmadığını ayarlayabiliyoruz
+
+# LTRIM(), RTRIM()
+"""
+SELECT LTRIM ('     CHARACTER ')   # Sadece soldaki boşluklar gitti çıktıda
+SELECT RTRIM ('     CHARACTER ')   # Sadece sağdaki boşluklar gitti çıktıda
+"""
+##############################################################
+# REPLACE(), STR()
+# Replace: Bir textin içerisindeki ifade yerine başka bir ifade yazmamızı sağlar
+# Str: Nümerik sayının string e çevrilmesini istersek kullanıyoruz
+
+# REPLACE
+"""
+SELECT REPLACE('CHARACTER STRING', ' ', '/')  # 'CHARACTER STRING' içinde Boşluk varsa, bunu slash(/) ile değiştir # output: CHARACTER/STRING
+SELECT REPLACE('CHARACTER STRING', 'CHARACTER STRING', 'CHARACTER')     # Output: CHARACTER
+# 'CHARACTER STRING' içinde 'CHARACTER STRING' varsa, bunun 'CHARACTER' ile değiştir dedik
+"""
+# STR
+"""
+SELECT STR (5454)                   # Output:       5454  # Output da dtype: Text # NOT: başına 6 boşluk ekleyip sonra texte çevirdi
+# NOT: String fonksiyonu bize 10 karakterlik text döndürüyor. Mesela 10 dan fazla yazarsak
+SELECT STR(1234567890123456)        # Output: **********  # 10 karakter döndürmek yerine SQL çıktı vermenin mantıksız olacağını düşünüp 10 tane * veriyor
+SELECT STR (2135454654)             # Output: 2135454654  # Output da dtype: Text           
+SELECT STR (133215.654645, 11, 3)   # Output: 133215.655  # Toplam 11 karakter olsun(boşluklarla vs), 3 karakterde virgülden sonra olacak
+# NOT: Sonu 655 geldi çünkü sondaki 4 ü 5 e yuvarladı
+"""
+################################################################
+# CAST()    : Bir ifadenin başka bir veritipine dönüştürülmesini sağlıyor. Mesela text ile numeric i concat ederken işe yarıyor
+            ###### Örnek: SELECT 'customer' + '_' + CAST(1 AS VARCHAR(1)) AS col;
+# CONVERT() : Tanımlanmış cast işlemleri. Tarih veriyorum. Bunların içinden  belii parçasını getir. Veri tipini döndürmeyede yarar. Örneklerde göreceğiz
+
+"""
+SELECT CAST (12345 AS CHAR)  # Gördüğü şeyi(12345) string e çevirdik   # Output: 12345
+SELECT CAST (123.65 AS INT)  # float ı integer a çevirdi               # Output: 123
+
+SELECT CONVERT(int, 30.60)                 # integer veritipinde bir sonuç istiyoruz       # output: 30
+SELECT CONVERT (VARCHAR(10), '2020-10-10') # VARCHAR(10) veritipinde bir sonuç istiyoruz   # output:2020-10-10 : dtype:text
+# CONVERT özellikle tarih veritiplerinde kullanırız, 
+SELECT CONVERT (DATETIME, '2020-10-10')   # DATETIME veritipinde bir sonuç istiyoruz      # output: 2020-10-10 00:00:00:000
+SELECT CONVERT (NVARCHAR, GETDATE(),112)  # NVARCHAR veritipinde bir sonuç istiyoruz      # output: 20220606
+# Convertte, Cast ten farklı olarak önceden tanımlanmış fonksiyonlar var
+# GETDATE() sonucunu al NVARCHAR a çevir, 112 formatında(YYYYMMDD) texte çevir   
+SELECT CAST ('20201010' AS DATE)              # output:
+SELECT CONVERT (NVARCHAR, CAST ('20201010' AS DATE),103 ) # integer veritipinde bir sonuç istiyoruz  # output:
+
+# NOT: Yazdığımız sorgunun veritipini görme ;
+# .. Sorgunuzu tablo olarak create edip sonrasında sp_help 'dbo.table_name' yazdığınız zaman görürüz
+"""
+# DERSIN 2. BÖLÜMÜ
+################################################################
+# COALESCE
+# Bir takım girdileriniz var bazılarını boş olabilir. Siz ilk dolu olanı almak istediğinizde kullanıyorsunuz
+"""
+SELECT COALESCE(NULL,'Hi','Hello',NULL)  # En az 2 parametre atamalıyız parantez içine,  # Output: Hi
+"""
+
+################################################################
+# NULLIF
+# 2 değer var bu değerlerin birbirine eşit olup olmaması. Eşitse boş değer döbdürmesini, eşit değilse ilk
+# .. dolu olanı getirmesini istersek bu fonksiyonu kullanıyoruz
+"""
+SELECT NULLIF (10,10)         # Output: NULL
+SELECT NULLIF (10,11)         # Output: 10
+ 
+select ISNULL(NULL,'No')  -- No
+select ISNULL(11,10)  --  11
+select ISNULL(10,11)  --  10
+SELECT NULLIF(11,10)  --  11
+SELECT NULLIF(11,11)  -- NULL
+SELECT NULLIF(ISNULL(11,10),10) --11
+
+"""
+
+################################################################
+# ROUND()     : Float veritipinde virgülden sonra Round diyerek yuvarlayabilmemizi sağlar
+# ISNULL()    : 2 parametre yazacağız mesela birinci parametre NULL sa ikinci parametreyi getirecek
+        ####### ÖRN: Öğrenci yaş ortalamasını al diyeceğiz mesela. NULL olmayan değerlerin ortalamasını al derken bunu kullanacağız.
+# ISNUMERIC() : Tablo içerisinde değerleri ortalama işlemine dahil etmek istiyorsunuz ama içerde karakterler içerde karışmış olabilir
+# .. bundan önce bu veri nümeric mi değil mi derken bu fonk. kullanıyoruz
+"""
+SELECT ROUND (432.368, 2,0)  # output: 432.370 # Virgülden sonraki 2 karaktere göre yuvarla
+# Buradaki 0 : 0 ya da 1 değer alıyor
+# default olarak 0 alıyor yukarı yuvarlar. 0 ı yazmasakta olur
+# 1 yazarask aşağı yuvarlar
 """
 ######################
 """
-SELECT * FROM product.product
-WHERE model_year BETWEEN 2019 AND 2021
-
-"""
+SELECT ISNULL(NULL, 'ABC')   # output: ABC
+SELECT ISNULL('', 'ABC')     # output: (Boş geldi)  # Dikkat: burada ilk parametre NULL DEĞİL
+""" 
 ######################
 """
-# Çok büyük tablolarda min ya da max değeri görmez için ORDER BY ASC/DESC kullanabiliriz
-
-SELECT TOP 1 * FROM product.product
-WHERE model_year BETWEEN 2019 AND 2021
-ORDER BY model_year DESC
-
-"""
-######################
-"""
-SELECT * FROM product.product
-WHERE category_id IN (3,4,5)
-
-# 3 numaralı ya da 4 numaraları ya da 5 numaralarınu alan category_id yi getirdik
-"""
-######################
-"""
-# 2. yol . Üstteki ile aynı çıktı gelecek
-
-SELECT * FROM product.product
-WHERE category_id=3 OR ategory_id=4 OR ategory_id=5
-
-"""
-######################
-"""
-# Yukardakiler için 3,4,5 in haricindekiler
-
-SELECT * FROM product.product
-WHERE category_id NOT IN (3,4,5)
-"""
-######################
-"""SELECT * FROM product.product
-WHERE category_id NOT IN (3,4,5)
-"""
-######################
-"""
-# 2. yol . Üstteki ile aynı çıktı gelecek
-
-SELECT * FROM product.product
-WHERE category_id <> 3 AND ategory_id <> 4 AND ategory_id <> 5
-
-<> : "Eşit değildir" anlamında , Ayrıca
-!= : "Eşit değildir" anlamında bu da
-"""
-######################
+SELECT ISNUMERIC(123)      # output: 1  # 1:True
+SELECT ISNUMERIC('ABC')    # output: 0  # 0:False
 """
 
-SELECT * FROM product.stock
-
-# Bu tablo neyi anlatıyor bana? Store ile product ın ilişkisi
-# Hangi mağaza hangi ürünün stock u var
-# Primary key hangi sütun olmalı ? 
-# store_id ve product_id birlikte primary key olmalı
-# Çünkü store_id ve quantity yi yanyana koysam bu iki sütun net bir bilgi veremiyor
-# product_id ile quantity yi yanyana koysam 1. numaraları product ın quantitileri farklı ama net bir bilgi
-# .. alamıyorum yine. product_id neden çoklamış, quantity neyin miktarı vs? Bu tabloyu okuyamıyoruz böyle
-# .. O yüzden 2 sütun(product_id, store_id) bir olup composite primary key oldu
+#%% ################################################################################################################################
+# JOINS
+# TABLE OF CONTENTS
+# Introduction to Joins
+    # JOIN: Birden fazla tablonun birleştirilmesi. Ona göre sorgu yazacağız
+# INNER JOIN  : 2 tane tabloda ortak olan satırları döndürür
+    # 2 tabloyu bir condition ile;    
+        # SELECT COLUMNS FROM table_A INNER JOIN table_B ON join_conditions
+        # join_conditions: Mesela 1. tablodan gelen TC ile 2. tablodan gelen TC lerinin eşit olanları getir
+    # Birden fazla tabloyu conditionlar ile join etmek istersek;
+        # SELECT COLUMNS FROM table_A INNER JOIN table_B ON join_conditions1 AND join_conditions2 INNER JOIN table_C ON join_conditions3 OR join_conditions4 ...
+"""
+# Soru: Select product ID, product name, category ID and category name and make join example 
+SELECT	A.product_id, A.product_name,
+		B.category_id, B.category_name
+FROM	product.product AS A
+INNER JOIN product.category AS B
+on A.category_id = B.category_id
 """
 
-#%% # Dersin 2. bölümü
-##################################################################
-# Date Functions
+# DERSIN 3. BÖLÜMÜ
 """
-Data types
-time              : saat verisi varsa
-date              : tarih verisi varsa
-smalldatetime     : tarih ve saat verisi birlikte
-datetime          : tarih ve saat verisi birlikte
-datetime2         : tarih ve saat verisi birlikte
-datetimeoffset
+# Soru: List employees of stores with their store information. select employee name, surname, store names
+SELECT	A.first_name, A.last_name,
+		B.store_name
+FROM	sale.staff AS A
+INNER JOIN sale.store AS B
+on A.store_id = B.store_id
+
+# NOT:Bu 2 tablo arasında ilişki olmak zorunda değil ,örneğin staff ile customer tablosunda last_name e göre join yapabiliriz
+# .. ve bunlar arasında direk ilişki yok diagrama bakarsak. Sadece önemli olan veri tiplerinin eşit olması
+"""
+###################################
+# LEFT JOIN  : 2 tane tabloda soldaki tabloyu baz alarak değerleri getiriyor. 2. tablodaki değerler 1. tablodada varsa getirir yoksa NULL getirir
+    # SELECT columns FROM table_A LEFT JOIN table_B ON join conditions
+"""
+# SORU: Write a query that returns products that have never been ordered. Select product ID, product name, orderID
+SELECT A.product_id, A.product_name, B.order_id 
+FROM product.product A
+LEFT JOIN sale.order_item B 
+on A.product_id = B.product_id
+WHERE B.order_id is null    
+
+# WHERE B.order_id is null: B de order_id sinde veri olmayan satırlar # 213 rows
+"""
+################
+"""
+# Soru: Report the stock status of the products that product id greater than 310 in the stores
+# .. Expected columns: product_id, product_name, store_id, product_id,
+SELECT A.product_id, A.product_name, B.*
+FROM product.product A
+LEFT JOIN product.stock B 
+on A.product_id = B.product_id
+WHERE A.product_id >310 
+
+# 237 rows
+# NOT: EĞER ; WHERE B.product_id >310 yazsaydık  # 159 rows gelecekti
+# Çünkü asıl sorgumuzda B den null lar geldi(B deki product_id den-4.sütun), B.product_id >310 yazınca null lar gelmedi
+"""
+###################################
+# RIGHT JOIN   : 2 tane tabloda sağdaki tabloyu baz alarak değerleri getiriyor. 1. tablodaki değerler 2. tablodada varsa getirir yoksa NULL getirir
+    # SELECT columns FROM table_A RIGHT JOIN table_B ON join conditions
+"""
+# Önceki sorguyu right joinle yazın
+SELECT B.product_id, B.product_name, A.*
+FROM product.stock A
+RIGHT JOIN product.product B 
+on A.product_id = B.product_id
+WHERE B.product_id >310 
+
+# Yine 237 row geldi gördüğümüz gibi
+"""    
+###################################
+# FULL OUTER JOIN: 2 tabloyu join edeceğiz. Ama 1. tabloda olup 2. tabloda olmayan, 2.tabloda olup 
+# .. 1. tabloda olmayan ve 2 tabloda da olanlar var.Bu 3 durum birleşip olarak hepsini getir
+# Self Join
 
 """
-######################
-# GETDATE() : Sisteminizin o anlık saatini datetime data tipinde getirir
-"""
-CREATE TABLE t_date_time (
-	A_time time,
-	A_date date,
-	A_smalldatetime smalldatetime,
-	A_datetime datetime,
-	A_datetime2 datetime2,
-	A_datetimeoffset datetimeoffset
-	)
+Soru: Write a query that returns stock and order information together for all products(top100)
+expected columns product_id, store_id, quantity, order_id, list_price
 
-# "t_date_time isminde" bir tablo oluşturduk
-# 6 tane sütunu var. Her sütunun veritipi fatklı
-# Şimdi inceleyelim
-"""
-######################
-"""
-SELECT * from t_date_time
+SELECT TOP 100 A.product_id, B.store_id, B.quantity, C.order_id, C.list_price
+FROM product.product A
+FULL OUTER JOIN product.stock B
+ON A.product_id = B.product_id
+FULL OUTER JOIN sale.order_item C
+ON A.product_id = C.product_id
+ORDER BY B.store_id               
 
-# Şu an boş. 
+# ORDER BY B.store_id:  Bunu yazarsak NULL ları net görebiliriz(Top 100 yazmasakta görebiliriz)
+# 501 numaralı product_id(product tablosunda) -- Bu ürün stocklarda bulunmuyor, bu ürünün siparişide söz konusu olmamış vs
+"""
+###################################
+# CROSS JOIN
+# İki tablonun birbirleriyle kartezyen olarak çarpılması. Bütün varyasyonları görmek istiyorsak bunu kullanıyoruz
+"""
+# Soru: In the stocks table, there are not all products held on the product table and 
+# .. you want to insert these products into the stock table.
+#.. You have to insert all these products for every three stores with '0(zero)' quantity
 
-SELECT GETDATE() as get_date
-# Tarih saat ve nanosecond sonuç döndürdü
+SELECT	B.store_id, A.product_id, 0 quantity
+FROM	product.product A
+CROSS JOIN sale.store B
+WHERE	A.product_id NOT IN (SELECT product_id FROM product.stock)  
+ORDER BY A.product_id, B.store_id
 
-# Insert yapalım yukarda oluşturduğumuz tabloya
-
-INSERT t_date_time
-VALUES (GETDATE(),GETDATE(),GETDATE(),GETDATE(),GETDATE(),GETDATE())
-
-# Her bir sütun için GETDATE() insert ettik
-# Her sütun kendi veritipine uygun şekilde yazdırdı
-"""
-######################
-"""
-INSERT t_date_time (A_time, A_date, A_smalldatetime, A_datetime, A_datetime2, A_datetimeoffset)
-VALUES
-('12:00:00', '2021-07-17', '2021-07-17','2021-07-17', '2021-07-17', '2021-07-17' )
-
-# "time" formatına uygun şekilde values un ilk değerini saat şeklinde yazdık, diğerlerine sadece tarih girelim
-# Kendi formatlarına uygun çıktı getirdiler yine
-"""
-#######################
-# Farklı ülkelerin veya farklı kullanım amaçlarına göre tarih stillleri var
-# Her bir stilin kodu var (1,2,3,4,5,6,7,(8 veya 108))
-# Verinizdeki tarih formatı bize uygun değilse bu still ile değiştirebiliriz.
-# Örnek yapalım
-"""
-SELECT CONVERT(VARCHAR, GETDATE(), 6)   # GETDATE() i varchar a dönüştürdük. Still kodu 6 yani burada 6 görmek istediğimiz format
-
-SELECT CONVERT(DATE, '25 Oct 21', 6)    # Varchar ı date e dönüştürdük
-"""
-#######################
-"""
-# Farka bakalım dönüştürmeden önce ve sonra
-
-SELECT GETDATE()
-SELECT CONVERT (VARCHAR(10), GETDATE(), 6)
-
-# target_dtype : (VARCHAR(10) : Veri tipi
-# GETDATE()    : Dönüştürmek istediğim değer
-# 6            : "Date only format tablosundaki" Dönüştürmek istediğim stil no 
-"""
-#######################
-"""
-SELECT CONVERT(DATE, '25 Oct 21', 6) 
-
-# target_dtype : DATE : Veri tipi
-# '25 Oct 21'  : Dönüştürmek istediğim değer
-# 6            : "Date only format tablosundaki" Dönüştürmek istediğim stil no 
-"""
-# NOT: convert ü varchar ı integer a ya da integer ı varchar a convert etmek için kullanıyoruz
-
-############################################
-# Return Date or Time Parts
-# Date ten istediğimiz parçaları alacağız
-"""
-FUNCTION         SYNTAX                         RETURN DATA TYPE
-------------------------------------------------------------------
-DATENAME        DATENAME(datepart, date)           nvarchar
-DATEPART        DATEPART(datepart, date)            int
-DAY             DAY(date)                           ...
-MONTH           MONTH(date)                         ...
-YEAR            YEAR (date)                         ...
-"""
-########################
-"""
-SELECT A_DATE
-		, DAY(A_DATE) DAY_
-		, MONTH(A_DATE) [MONTH]
-		, DATENAME(DAYOFYEAR, A_DATE) DOY
-		, DATEPART(WEEKDAY, A_date) WKD
-		, DATENAME(MONTH, A_DATE) MON
-FROM t_date_time
-
-# Burada fonksiyonlar (Python daki built-in gibi olduğu için) isim verirken DAY sonuna alt tire
-# .. ya da MONTH u köşeli parantez içine alarak fonksiyon rengi pembeye dönmeden sütuna bu şekilde
-# .. isim atayabiliriz)
-"""
-################################################
-# Return Date and Time Difference Values
-# DATEDIFF: 2 zaman arasındaki farkı alacağız(gün farkı, dakika farkı, saat farklı vs)
-"""
-FUNCTION         SYNTAX                                      RETURN DATA TYPE
-------------------------------------------------------------------
-DATEDIFF        DATEDIFF(datepart, startdate, enddate)            int
-"""
-########################
-"""
-SELECT DATEDIFF(DAY,'2022-05-10',GETDATE())
-
-# şu anki zaman ile 2022-05-10 arasındaki güm farklı nı
-"""
-########################
-"""
-SELECT DATEDIFF(SECOND,'2022-05-10',GETDATE())
-"""
-################################################
-# Modify Date And time values
-
-"""
-FUNCTION         SYNTAX                                      RETURN DATA TYPE
-------------------------------------------------------------------
-DATEADD    DATEADD(datepart, number, date)     the date type of the date argument 
-EOMONTH    EOMONTH(start_date [,month_to_add]) return type is the type of the start_date argument, or alternately, the date data type
-
-# DATEADD : belirtiğimiz zamana eklemek istediğimiz değer
-# EOMONTH : ayın son gününü verir
-# Örnek yapalım
-"""
-########################
-"""
-SELECT DATE(DAY,5,GETDATE())     # Bu günden itibaren 5 gün ekledi
-SELECT DATE(MINUTE,5,GETDATE())
-"""
-########################
-"""
-SELECT EOMONTH(GETDATE())
-SELECT EOMONTH(GETDATE(),2)
-
-# Bulunduğumuz aydan, 2 ay sonrasının, son günü
-"""
-########################
-"""
-# Veritabanımızdan örnek yapalım
-
-SELECT * FROM sale.orders
-
-# Burada bazı tarihler var burada
+WHERE	A.product_id NOT IN (SELECT product_id FROM product.stock) :  # product_id stock tablosunda olmayan ürünleri listele.Yani mesela 443 product_id nin quantity si 0
 """
 
-#%% Dersin 3. bölümü
-########################
-"""
-# Her bir sipariş için sipariş tarihi ve kargolama tarihi arasındaki farkı GÜN cinsinden bulalım
+###################################
+# Hoca: Alttakileri size göndereceğim
+# SELF JOIN
+# VIEW
 
-SELECT *, DATEDIFF(DAY, order_date, shipped_date) Diff_of_day
-FROM sale.orders
-"""
-########################
-"""
-# Her bir sipariş için sipariş tarihi ve kargolama tarihi arasında 2 günden fazla geçenler
-
-SELECT *, DATEDIFF(DAY, order_date, shipped_date) Diff_of_day
-FROM sale.orders
-WHERE DATEDIFF(DAY, order_date, shipped_date) > 2
-
-# 463 rows geldi
-"""
-########################
-"""
-SELECT *
-FROM sale.orders
-WHERE DATEDIFF(DAY, order_date, shipped_date) > 2
-
-# Böyle yapsaydık Diff_of_day sütunu gözükmezdi ama kod çalışırdı
-# Tekrardan 463 rows
-"""
-
-#########################################################
-# Bir ifadenin gün formatına uygun olup olmadığına bakar
-"""
-FUNCTION         SYNTAX    
-ISDATE           ISDATE(EXPRESSION)
-"""
-
-#########################################################
-# STRING FUNCTIONS
-# 1.Character strings Data types
-# 2.String functions
-# 3.Related Topics
-
-# String functions
-# LEN(input_string)                          : karakter  uzunluğu
-# CHARINDEX(substring, string[,start_location])   : Karakterin indexi, örn: ahmet te "H" harfi kaçıncı karakter
-# PATINDEX('%pattern%', input_string)        : Bir patern aradığımız zaman örn: Bir sütunda "h" ve "m" harflerinin yan yana olduğu pattern i aramak istersek
-
-"""
-SELECT LEN ('CHARACTER ')                # Output : 10  # çünkü boşluk var burada onu da karakter olarak sayıyor
-SELECT CHARINDEX('R','CHARACTER')        # Output : 4   # Kelime içerisinde "r" nin indexini bulalım 
-SELECT CHARINDEX('R','CHARACTER',5)      # Output : 9   # Saymaya 5 ten başla. 5 ten başladığı için ilk "R" yi atladı ve ikinci "R" nin indexini yazdı
-SELECT CHARINDEX('RA','CHARACTER',5)
-SELECT CHARINDEX('RA','CHARACTER',5) -1  # Output : 9: # Saymaya 5 ten başla. (Aslında) burada 2. "R" den bir önceki karakterin index numarasını getirdi
-SELECT PATINDEX('%R', 'CHARACTER')       # Output : 9 # R ile biterse "R" nin indexi
-SELECT PATINDEX('%H%', 'CHARACTER')      # Output : 2
-SELECT PATINDEX('%A%', 'CHARACTER')      # İlk A yı aldık(2 tane A var)
-SELECT PATINDEX('__A______', 'CHARACTER') # A dan önce 2, A dan sonra 6 karakter olan bir pattern var mı?
-SELECT PATINDEX('__A%', 'CHARACTER')      # Output : 1
-SELECT PATINDEX('____A%', 'CHARACTER')    # Output : 1  
-SELECT PATINDEX('%A____', 'CHARACTER')    # Output : 5   # 2. A nın indexini getirdi
-# %R  : Burada yüzde; sayısını bilmediğim kadar karakter
-# NOT: charindex fonksiyonunda indexlemeye 1 den başlıyor
-"""
-
-######################################
-# LEFT()      : Soldan istediğimiz kadar karakter almamıza yarar
-# RIGHT()     : Sağdam istediğimiz kadar karakter almamıza yarar
-# SUBSTRING() : BAşlangıç ve bitiş karakterini vererek  sağdan,soldan veya ortadan istediğimiz kadar karakter almamıza yarar
-
-"""
-SELECT LEFT('CHARACTER',3)
-SELECT RIGHT('CHARACTER',3)
-SELECT SUBSTRING('CHARACTER',3,5)  # Output: ARACT  # 3 ten başla , 5 karakter al
-SELECT SUBSTRING('CHARACTER',4,9)  # Output: RACTER # 4 ten başla, 9 karakter al(ama 4 ten sonra 9 karakter alamadığı için sonuna kadar aldı)
-
-"""
-
-######################################
-# LOWER()      : Küçük harfe döndürür
-# UPPER()      : Büyük harfe döndürür
-# STRING_SPLIT : A table-value function: Öncekiler(Yukarıdakiler) tek bir değer döndürüyordu, A table-value function bir tablo döndürecek
-
-"""
-SELECT LOWER('CHARACTER')   # output : character
-SELECT UPPER('character')   # output : CHARACTER
-SELECT * FROM STRING_SPLIT('jack,martin,alain,owen', ',')              # Buradaki her bir ismi tek bir sütunda tablo kaydı olarak döndürdük
-SELECT value FROM STRING_SPLIT('jack,martin,alain,owen', ',')          # value ile de tablonun değerlerini yakalayabiliriz
-SELECT value as name FROM STRING_SPLIT('jack,martin,alain,owen', ',')  # sütun ismi "name" oldu
-
-# NOT: Burada virgül: "ayırt edici değer"
-"""
-
-"""
-# ÖRNEK : 'character' kelimesinin ilk harfini büyüten bir script yazınız
-
-SELECT UPPER(LEFT('character',1))+(RIGHT('character',8))
-SELECT UPPER(LEFT('character',1)) + LOWER(SUBSTRING('character',2,9))  # Eğer burda tek string yerine bir sütun olsaydı,
-# ..  9 yerine her bir string için farklı değer girmem gerekirdi. Çözüm;
-SELECT UPPER(LEFT('character',1)) + LOWER(SUBSTRING('character',2,LEN('character')))
-# Concat ile bakalım
-SELECT CONCAT UPPER(LEFT('character',1)) , LOWER(SUBSTRING('character',2,LEN('character')))
-# DIKKAT: Arada artı yerine virgül var burada
-"""
-
-################################################ END ########################################################
-
-
-
+################################################# END ###########################################
