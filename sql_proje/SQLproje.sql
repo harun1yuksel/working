@@ -109,7 +109,7 @@ from combined_table
 
 alter table combined_table add DaysTakenForDelivery as Datediff(day, Order_Date, Ship_Date)
 
-SELECT * 
+SELECT Cust_id, Order_ID, DaysTakenForDelivery
 from combined_table
 
 /*q4
@@ -136,37 +136,20 @@ FROM combined_table
 where MONTH(Order_Date) = 1 
 
 ------
+SELECT distinct Cust_id, MONTH(order_date) as order_month
+from combined_table
+
 with A as (
-    SELECT distinct MONTH(Order_Date) as order_month, cust_id, order_date,  
-    row_number() over(PARTITION by cust_id order by MONTH(Order_Date)) as count_of_ordered_months
-    From combined_table
-   
+    SELECT distinct Cust_id, MONTH(order_date) as order_month
+from combined_table
 )
-select *, A.Cust_id as cust_id_ordeded_every_month
+
+SELECT Cust_id, order_month,
+row_number() over(PARTITION by cust_id order by order_month) num_of_ordered_month
 from A
-Where count_of_ordered_months = 12
 
+/* yukarıdaki tabloya göre her ay sipariş veren müşteri bulunamadı */ 
 
-
-create VIEW cust_id_ordeded_every_month AS
-    with A as (
-        SELECT cust_id, order_date, MONTH(Order_Date) as order_month, 
-        row_number() over(PARTITION by cust_id order by MONTH(Order_Date)) as count_of_ordered_months
-        From combined_table
-    
-    )
-    select A.Cust_id as cust_id_ordeded_every_month
-    from A
-    Where count_of_ordered_months = 12
-
----------------------
-
-select count(*) custCount_ordered_jan_and_everyMonth 
-from 
-    (SELECT distinct cust_id as cust_ordered_jan, order_date, Customer_Name
-    FROM combined_table
-    where MONTH(Order_Date) = 1)   A,  cust_id_ordeded_every_month B 
-    Where A.cust_ordered_jan = B.cust_id_ordeded_every_month
 
 
 /* q6
@@ -175,10 +158,25 @@ purchasing and the third purchasing, in ascending order by Customer ID
 */
 
 select Cust_id, Customer_Name, Order_Date, 
-lag(Order_Date, 2) over(PARTITION by cust_id order by Order_Date ) as third_order,
-Datediff(day, lag(Order_Date, 2) over(PARTITION by cust_id order by Order_Date ), Order_Date) as days_between_3th_1th_order
+lag(Order_Date, 2) over(PARTITION by cust_id order by Order_Date ) as two_previous_order,
+Datediff(day, lag(Order_Date, 2) over(PARTITION by cust_id order by Order_Date ), Order_Date) as days_between_current_and_two_previous_ord
 from combined_table
-order by cust_id
+
+
+with A as (
+    select Cust_id, Customer_Name, Order_Date, 
+    lag(Order_Date, 2) over(PARTITION by cust_id order by Order_Date ) as two_previous_order,
+    Datediff(day, lag(Order_Date, 2) over(PARTITION by cust_id order by Order_Date ), Order_Date) as days_between_3th_and_1th_ord,
+    ROW_NUMBER() over(PARTITION by cust_id order by Order_Date ) as row_num
+    from combined_table
+)
+SELECT *
+from A
+where A.row_num = 3 and days_between_3th_and_1th_ord != 0 ---aynı gün birden fazla sipariş verenler hariç. ikinci koşul kaldırılırsa dahil olur fark 0 gün görünür.
+
+
+
+
 
 /* q7
 
@@ -256,17 +254,163 @@ where A.cust_id = B.cust_id and A.cust_id = C.cust_id
 
 -------Customer Segmentation------
 
-/* q1
+/* 
+Categorize customers based on their frequency of visits.
+*/
+
+SELECT distinct cust_id, order_date
+from combined_table   --- devam eden hesaplarda bu tablo kullanılacak böylece aynı gün verilen siparişler tek sipariş gibi heaplama yapılcak.
+
+with A as (
+    SELECT distinct cust_id, order_date
+    from combined_table 
+    )
+
+SELECT cust_id, Order_Date, 
+lag(Order_Date) over(PARTITION by cust_id order by order_date) as previous_visit,
+count(*) over(PARTITION by cust_id) as num_of_visits
+from A
+
+
+with A as (
+    SELECT distinct cust_id, order_date
+    from combined_table 
+    )
+
+
+SELECT cust_id, Order_Date, 
+lag(Order_Date) over(PARTITION by cust_id order by order_date) as previous_visit ,
+DATEDIFF(DAY, lag(Order_Date) over(PARTITION by cust_id order by order_date), Order_Date) as days_between_visits,
+count(*) over(PARTITION by cust_id) as num_of_visits
+from A
+
+create view diff_of_visits AS 
+    with A as (
+        SELECT distinct cust_id, order_date
+        from combined_table 
+        )
+
+
+    SELECT cust_id, Order_Date, 
+    lag(Order_Date) over(PARTITION by cust_id order by order_date) as previous_visit ,
+    DATEDIFF(DAY, lag(Order_Date) over(PARTITION by cust_id order by order_date), Order_Date) as days_between_visits,
+    count(*) over(PARTITION by cust_id) as num_of_visits
+    from A
+
+
+
+SELECT *,
+avg(days_between_visits) over(PARTITION by cust_id) as avg_visit_frequency_days
+from diff_of_visits 
+
+
+---- 'regular and frequent' : ziyare sayısı 3 ten fazla ve ve iki ziyaret arasındaki ortlama gün sayısı 60 ve altında ise
+---- 'regular but not frequent' : ziyare sayısı 3 ten fazla ama iki ziyaret arasındaki ortlama gün sayısı 60 ın üzerinde ise
+---- 'not regular' : ziyare sayısı 3 ten az ise
+
+SELECT *,
+avg(days_between_visits) over(PARTITION by cust_id) as avg_visit_frequency_days,
+case 
+
+    when num_of_visits >= 3 and avg(days_between_visits) over(PARTITION by cust_id) <= 60 then 'regular and frequent' 
+    when num_of_visits >= 3 and avg(days_between_visits) over(PARTITION by cust_id) > 60 then 'regular but not frequent'
+    else 'not regular' END as frequency_of_visits
+
+from diff_of_visits 
+
+
+/* Month-Wise Retention Rate */
+
+
+SELECT Cust_id, order_date, month(order_date) as [month], YEAR(order_date) [year]
+from combined_table
+
+SELECT cust_id, order_date,
+   DATEADD(MONTH, DATEDIFF(MONTH, 0, order_date), 0) AS year_month
+FROM
+   combined_table
+
+alter table combined_table add year_month as DATEADD(MONTH, DATEDIFF(MONTH, 0, order_date), 0)
+
+SELECT cust_id, order_date, year_month
+FROM
+   combined_table ---aynı ay içinde aynı müşteriye ait kayıtlar var
+
+
+SELECT count(cust_id), year_month
+FROM
+   combined_table
+Group by year_month ------aynı ay içinde aynı müşteriye ait kayıtlar var
+
+
+SELECT count(distinct cust_id) count_of_customers_monthly, year_month
+FROM combined_table
+Group by year_month -----distinct ile saydırınca her ay kaç farklı müşteri olduğunu verdi
+
+
+with A as (
+    SELECT count(distinct cust_id) count_of_customers_monthly, year_month
+FROM combined_table
+Group by year_month
+)
+
+SELECT distinct B.Cust_id, B.Order_Date, count_of_customers_monthly, A.year_month
+From A, combined_table B
+WHERE A.year_month = B.year_month
+
+CREATE VIEW monthly_cust_count AS
+    with A as (
+    SELECT count(distinct cust_id) count_of_customers_monthly, year_month
+    FROM combined_table
+    Group by year_month
+    )
+
+    SELECT distinct B.Cust_id, B.Order_Date, count_of_customers_monthly, A.year_month
+    From A, combined_table B
+    WHERE A.year_month = B.year_month
+
+
+SELECT Cust_id, order_date, lag(order_date) over(PARTITION by cust_id order by order_date) as previous_order_date, 
+        year_month, count_of_customers_monthly
+from monthly_cust_count
+
+
+SELECT Cust_id, order_date, lag(order_date) over(PARTITION by cust_id order by order_date) as previous_order_date, 
+        DATEDIFF(MONTH, lag(order_date) over(PARTITION by cust_id order by order_date), order_date) as month_between_orders,
+        year_month, count_of_customers_monthly
+from monthly_cust_count
+
+
+CREATE VIEW cust_in_2consecutive_months AS
+    with A AS(
+        SELECT Cust_id, order_date, lag(order_date) over(PARTITION by cust_id order by order_date) as previous_order_date, 
+            DATEDIFF(MONTH, lag(order_date) over(PARTITION by cust_id order by order_date), order_date) as month_between_orders,
+            year_month, count_of_customers_monthly
+        from monthly_cust_count
+
+    )
+
+        SELECT *
+        from A
+        where month_between_orders = 1;
+
+SELECT *
+from cust_in_2consecutive_months --- bu tablo peşpeşe iki ay alışveriş yapan müşterileri getiriyor.
 
 
 
 
+SELECT *, count(month_between_orders) over(PARTITION by year_month) as monthly_count_of_retained_cust
+from cust_in_2consecutive_months
 
 
+with A As (
+    SELECT *, count(month_between_orders) over(PARTITION by year_month) as monthly_count_of_retained_cust
+    from cust_in_2consecutive_months
+)
 
-
-
-
-
+select distinct year_month, monthly_count_of_retained_cust, count_of_customers_monthly,
+cast(round(1.0 *  monthly_count_of_retained_cust / count_of_customers_monthly * 100, 2) as decimal(3,  1)) as monthwise_retention_rate
+from A
 
 
