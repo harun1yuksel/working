@@ -234,8 +234,8 @@ select sum(sep.Total_amount), sum(oct.Total_amount)
 from nyc_sample_data_for_sql_sep_2015 sep, nyc_sample_data_for_sql_oct_2015 oct
 where sep.driver_id = oct.driver_id*/
 
-select distinct sum(sep.Total_amount) OVER(PARTITION by month(sep.lpep_pickup_datetime)), 
-        sum(oct.Total_amount) over(PARTITION by month(oct.lpep_pickup_datetime))
+select distinct sum(sep.Total_amount) OVER(PARTITION by month(sep.lpep_pickup_datetime)) Sep_tot, 
+        sum(oct.Total_amount) over(PARTITION by month(oct.lpep_pickup_datetime)) Oct_tot
 from nyc_sample_data_for_sql_oct_2015 oct
 JOIN nyc_sample_data_for_sql_sep_2015 sep on sep.trip_id = oct.trip_id
 
@@ -248,3 +248,252 @@ from nyc_sample_data_for_sql_oct_2015
 ) 
 select distinct sum(sep_r) over(PARTITION by month(lpep_pickup_datetime))
 from cte
+
+-- İlknur Hoca'nun çözümleri
+-- WF ile
+with T1 as(
+	select lpep_pickup_datetime, Total_amount
+	from nyc_sample_data_for_sql_sep_2015
+	UNION ALL
+	select lpep_pickup_datetime, Total_amount
+	from nyc_sample_data_for_sql_oct_2015
+)
+select distinct 
+	sum(case when MONTH(lpep_pickup_datetime) = 9 then Total_amount end) over (partition by MONTH(lpep_pickup_datetime)) sep,
+	sum(case when MONTH(lpep_pickup_datetime) = 10 then Total_amount end) over (partition by MONTH(lpep_pickup_datetime)) oct
+from T1
+
+--Groupby ile
+with T1 as(
+	select lpep_pickup_datetime, Total_amount
+	from nyc_sample_data_for_sql_sep_2015
+	UNION ALL
+	select lpep_pickup_datetime, Total_amount
+	from nyc_sample_data_for_sql_oct_2015
+)
+select  
+	sum(case when MONTH(lpep_pickup_datetime) = 9 then Total_amount end) sep,
+	sum(case when MONTH(lpep_pickup_datetime) = 10 then Total_amount end) oct
+from T1
+group by MONTH(lpep_pickup_datetime)
+
+--Pivot ile
+select *
+from (
+	select MONTH(lpep_pickup_datetime) AS DATE_, Total_amount
+	from nyc_sample_data_for_sql_sep_2015
+	UNION ALL
+	select MONTH(lpep_pickup_datetime), Total_amount
+	from nyc_sample_data_for_sql_oct_2015
+) T1
+PIVOT (
+	SUM(Total_amount)
+	FOR DATE_ IN ([9],[10])) AS PIVOT_TABLE;
+--Q26
+select t1.driver_id, t1.oct_tot, t2.sep_tot, round(t1.oct_tot - t2.sep_tot,2)
+from
+(select driver_id, round(sum(Total_amount),2) oct_tot
+from nyc_sample_data_for_sql_oct_2015
+GROUP by driver_id) t1
+left join
+(select driver_id, round(sum(Total_amount),2) sep_tot
+from nyc_sample_data_for_sql_sep_2015
+group by driver_id) t2
+on t1.driver_id = t2.driver_id
+order by 1
+
+--Q27
+select t1.driver_id, trip_coct, trip_csep, trip_coct - trip_csep
+from
+(select driver_id, count(trip_id) trip_coct
+from nyc_sample_data_for_sql_oct_2015
+group by driver_id) t1
+left join 
+(SELECT driver_id, count(trip_id) trip_csep
+from nyc_sample_data_for_sql_sep_2015
+group by driver_id) t2
+on t1.driver_id = t2.driver_id
+order by driver_id
+
+--Q28
+--Subquery ile çözüm
+
+select t1.driver_id, rev_per_trip_oct, rev_per_trip_sep, (rev_per_trip_oct - rev_per_trip_sep)
+from
+(select driver_id, sum(Total_amount) / count(trip_id) rev_per_trip_oct
+from nyc_sample_data_for_sql_oct_2015
+GROUP by driver_id) t1
+left join
+(select driver_id, sum(Total_amount) / COUNT(trip_id) rev_per_trip_sep
+from nyc_sample_data_for_sql_sep_2015
+GROUP by driver_id) t2
+on t1.driver_id = t2.driver_id
+order by 1
+-- CTE ile çözüm
+with tab2 as (
+    select t1.driver_id, t1.oct_tot, t2.sep_tot, round(t1.oct_tot - t2.sep_tot,2) rnd
+from
+(select driver_id, round(sum(Total_amount),2) oct_tot
+from nyc_sample_data_for_sql_oct_2015
+GROUP by driver_id) t1
+left join
+(select driver_id, round(sum(Total_amount),2) sep_tot
+from nyc_sample_data_for_sql_sep_2015
+group by driver_id) t2
+on t1.driver_id = t2.driver_id
+),
+tab1 as(
+    select t1.driver_id, trip_coct, trip_csep, trip_coct - trip_csep dif_trip
+from
+(select driver_id, count(trip_id) trip_coct
+from nyc_sample_data_for_sql_oct_2015
+group by driver_id) t1
+left join 
+(SELECT driver_id, count(trip_id) trip_csep
+from nyc_sample_data_for_sql_sep_2015
+group by driver_id) t2
+on t1.driver_id = t2.driver_id
+)
+select tab1.driver_id, (oct_tot / trip_coct) rev_per_trip_oct, (sep_tot / trip_csep) rev_per_trip_sep
+from tab1, tab2 
+where tab1.driver_id = tab2.driver_id
+order by driver_id
+--Q29
+select t1.Dates, oct_tot_per_day, sep_tot_per_day, oct_tot_per_day - sep_tot_per_day diff
+from
+(select distinct DATENAME(dw,lpep_pickup_datetime) Dates,
+     sum(Total_amount) OVER(PARTITION by DATENAME(dw,lpep_pickup_datetime)) oct_tot_per_day
+from nyc_sample_data_for_sql_oct_2015 )t1
+left join
+(select distinct DATENAME(dw, lpep_pickup_datetime) Dates, 
+    sum(Total_amount) OVER(PARTITION by DATENAME(dw, lpep_pickup_datetime) ) sep_tot_per_day
+from nyc_sample_data_for_sql_sep_2015) t2
+on t1.dates = t2.dates
+--Q30
+select t1.driver_id,t1.Dates, oct_tot_per_day, sep_tot_per_day, oct_tot_per_day - sep_tot_per_day diff
+from
+(select distinct driver_id, DATENAME(dw,lpep_pickup_datetime) Dates,
+     sum(Total_amount) OVER(PARTITION by driver_id, DATENAME(dw,lpep_pickup_datetime)) oct_tot_per_day
+from nyc_sample_data_for_sql_oct_2015 )t1
+left join
+(select distinct driver_id, DATENAME(dw, lpep_pickup_datetime) Dates, 
+    sum(Total_amount) OVER(PARTITION by driver_id ,DATENAME(dw, lpep_pickup_datetime) ) sep_tot_per_day
+from nyc_sample_data_for_sql_sep_2015) t2
+on t1.dates = t2.dates and t1.driver_id = t2.driver_id
+--Q31
+SELECT t1.VendorID, tot_amnt_oct, tot_amnt_sep, tot_amnt_oct - tot_amnt_sep difference_amount,
+        tot_trip_oct, tot_trip_sep, tot_trip_oct - tot_trip_sep difference_trip
+from
+(select distinct VendorID, sum(Total_amount) OVER(PARTITION by VendorID) tot_amnt_oct,
+        COUNT(trip_id) OVER(PARTITION by VendorID) tot_trip_oct
+from nyc_sample_data_for_sql_oct_2015) t1
+left join
+(select distinct VendorID, sum(Total_amount) OVER(PARTITION by VendorID) tot_amnt_sep,
+        COUNT(trip_id) over(PARTITION by VendorID) tot_trip_sep
+from nyc_sample_data_for_sql_sep_2015) t2
+on t1.VendorID = t2.VendorID
+--Q32
+select *
+from nyc_sample_data_for_sql_sep_2015
+where trip_id in
+(select next_id
+from
+(select sep.trip_id prev_id, sep1.trip_id next_id, 
+    DATEDIFF(ms,sep.lpep_pickup_datetime,sep.Lpep_dropoff_datetime) prev_duration, 
+    DATEDIFF(ms,sep1.lpep_pickup_datetime,sep1.Lpep_dropoff_datetime) next_duration
+from nyc_sample_data_for_sql_sep_2015 sep
+JOIN
+nyc_sample_data_for_sql_sep_2015 sep1
+on sep.trip_id = sep1.trip_id - 1) tab1
+where next_duration > prev_duration)
+-----------
+select *, LEAD(trip_id) OVER()
+from
+(select trip_id ,
+    DATEDIFF(ms,lpep_pickup_datetime,Lpep_dropoff_datetime) duration
+from nyc_sample_data_for_sql_sep_2015 sep)tab1
+-------
+with cte as(
+    select trip_id ,
+    DATEDIFF(ms,lpep_pickup_datetime,Lpep_dropoff_datetime) duration
+from nyc_sample_data_for_sql_sep_2015 sep
+), cte2 as(
+select trip_id, duration, 
+    LEAD(duration) OVER(order by TRIp_id) liiiid, iif(LEAD(duration) OVER(order by TRIp_id) - duration > 0,1,0) diff
+from cte)
+select *
+from cte2
+where diff = 1
+--Q33
+
+(select *
+from
+(select sep.driver_id, sep.trip_id prev_id, sep1.trip_id next_id, 
+    DATEDIFF(ms,sep.lpep_pickup_datetime,sep.Lpep_dropoff_datetime) prev_duration, 
+    DATEDIFF(ms,sep1.lpep_pickup_datetime,sep1.Lpep_dropoff_datetime) next_duration,
+from nyc_sample_data_for_sql_sep_2015 sep
+JOIN
+nyc_sample_data_for_sql_sep_2015 sep1
+on sep.trip_id = sep1.trip_id - 1) tab1
+where next_duration > prev_duration and driver_id = 1)
+----------
+with cte as(
+    select trip_id ,driver_id,
+    DATEDIFF(ms,lpep_pickup_datetime,Lpep_dropoff_datetime) duration
+from nyc_sample_data_for_sql_sep_2015 sep
+
+), cte2 as(
+select trip_id, duration, driver_id,
+    LEAD(duration) OVER(partition by driver_id order by TRIp_id) liiiid, iif(LEAD(duration) OVER(order by TRIp_id) > duration ,1,0) diff
+from cte)
+select *
+from cte2
+where diff = 1 and driver_id = 1
+--Q34
+select driver_id, Trip_distance, cast(lpep_pickup_datetime as datetime) dates, 
+    DATEDIFF(s,lpep_pickup_datetime, Lpep_dropoff_datetime) duration,
+    rank() OVER(PARTITION by driver_id order by lpep_pickup_datetime) rnk
+from nyc_sample_data_for_sql_sep_2015
+-------
+with cte as(
+    select driver_id, Trip_distance, lpep_pickup_datetime,cast(lpep_pickup_datetime as datetime) dates, 
+    DATEDIFF(s,lpep_pickup_datetime, Lpep_dropoff_datetime) duration,
+    rank() OVER(PARTITION by driver_id order by lpep_pickup_datetime) rnk
+from nyc_sample_data_for_sql_sep_2015
+)
+select t1.driver_id, t1.lpep_pickup_datetime prev_time, t2.lpep_pickup_datetime next_time,
+    t1.duration prev_duration, t2.duration next_duration, t1.rnk prev_rnk, t2.rnk next_rnk
+from cte t1
+join cte t2
+on t1.driver_id = t2.driver_id and t1.rnk = t2.rnk - 1
+------
+with cte as(
+    select driver_id, Trip_distance, lpep_pickup_datetime,cast(lpep_pickup_datetime as datetime) dates, 
+    DATEDIFF(s,lpep_pickup_datetime, Lpep_dropoff_datetime) duration,
+    rank() OVER(PARTITION by driver_id order by lpep_pickup_datetime) rnk
+from nyc_sample_data_for_sql_sep_2015
+)
+
+select driver_id, min(next_duration - prev_duration)
+from (
+select t1.driver_id, t1.lpep_pickup_datetime prev_time, t2.lpep_pickup_datetime next_time,
+    t1.duration prev_duration, t2.duration next_duration, t1.rnk prev_rnk, t2.rnk next_rnk
+from cte t1
+join cte t2
+on t1.driver_id = t2.driver_id and t1.rnk = t2.rnk - 1) aaa 
+GROUP by driver_id
+--Q35
+with cte as(
+    select driver_id, Total_amount, lpep_pickup_datetime,cast(lpep_pickup_datetime as datetime) dates, 
+    DATEDIFF(s,lpep_pickup_datetime, Lpep_dropoff_datetime) duration,
+    rank() OVER(PARTITION by driver_id order by lpep_pickup_datetime,Total_amount) rnk
+from nyc_sample_data_for_sql_sep_2015
+)
+
+select driver_id, prev_amnt,next_amnt, next_amnt - prev_amnt
+from (
+select t1.driver_id, 
+    t1.Total_amount prev_amnt, t2.Total_amount next_amnt, t1.rnk prev_rnk, t2.rnk next_rnk
+from cte t1
+join cte t2
+on t1.driver_id = t2.driver_id and t1.rnk = t2.rnk - 1) aaa 
