@@ -67,3 +67,112 @@ with A as (
 )
 SELECT distinct lpep_pickup_day_of_week, avg(trip_count) over (PARTITION by lpep_pickup_day_of_week) avg_trip_per_day
 From A 
+
+---    8. Count of trips by hour (Luckily, we have hour column. Otherwise, a new hour column should be created from date column, then count trips by hour).
+SELECT *
+from sep_oct
+
+SELECT  distinct datepart(HOUR, [lpep_pickup_datetime]) as hour_in_day, 
+COUNT(*) over(partition by datepart(HOUR, [lpep_pickup_datetime])) as trip_count
+from sep_oct
+
+---    9. Average passenger count per trip.
+
+SELECT cast((1.0 * sum(Passenger_count) / COUNT(*)) as decimal (4, 2))
+from sep_oct
+
+select cast(avg(1.0 * Passenger_count) as decimal (4 , 2))
+from sep_oct
+
+----   10. Average passenger count per trip by hour.
+
+SELECT  distinct datepart(HOUR, [lpep_pickup_datetime]) as hour_in_day,
+cast((avg(1.0 * Passenger_count) over(PARTITION by datepart(HOUR, lpep_pickup_datetime))) as decimal (4, 2)) as trip_count_per_hour
+from sep_oct
+
+---    11. Which airport welcomes more passengers: JFK or Newark? Tip: check RateCodeID from data dictionary for the definition (2: JFK, 3: Newark).
+
+SELECT RateCodeID, sum(Passenger_count)
+from sep_oct
+group by RateCodeID
+ORDER by 1
+
+
+select distinct
+    case when RateCodeID = '1' then 'Standart Rate'
+        when RateCodeID = '2' then 'JFK'
+        when RateCodeID = '3' then 'Newark'
+        when RateCodeID = '4' then 'Nassau or Westchester'
+        when RateCodeID = '5' then 'Negoatiated Fare'
+        when RateCodeID = '6' then 'Group Ride'
+    end as RateCodeID,
+    sum(Passenger_count) OVER(PARTITION by RateCodeID) as passenger_count
+from sep_oct
+ORDER by 2
+
+         ---- or
+
+select distinct
+    case when RateCodeID = '1' then 'Standart Rate'
+        when RateCodeID = '2' then 'JFK'
+        when RateCodeID = '3' then 'Newark'
+        when RateCodeID = '4' then 'Nassau or Westchester'
+        when RateCodeID = '5' then 'Negoatiated Fare'
+        when RateCodeID = '6' then 'Group Ride'
+    end as RateCodeID,
+sum(Passenger_count) as passenger_count
+from sep_oct
+GROUP by RateCodeID
+ORDER by 2
+
+---   12. How many nulls are there in Total_amount?
+
+select sum(case when Total_amount is null then 1 else 0 end) as count_nulls,
+       count(Total_amount) count_not_nulls 
+from sep_oct
+
+  ---- 13. How many values are there in Trip_distance? (count of non-missing values)
+
+  SELECT Trip_distance
+  from sep_oct
+
+  SELECT distinct Trip_distance, COUNT(Trip_distance) over(PARTITION by Trip_distance) as count_of_trips
+  from sep_oct
+  ORDER by 1
+
+  ---   14. How many nulls are there in Ehail_fee? 
+
+select sum(case when Ehail_fee is null then 1 else 0 end) as count_nulls,
+       count(Ehail_fee) count_not_nulls 
+from sep_oct
+
+/*  15. Find the trips of which trip distance is greater than 15 miles (included) or less than 0.1 mile (included). 
+
+It is possible to write this with only one where statement. However, this time write two queries and "union" them. 
+The purpose of this question is to use union function. 
+You can consider this question as finding outliers in a quick and dirty way, which you would do in your professional life too often. */
+
+SELECT *
+from sep_oct
+WHERE Trip_distance >= 15
+union 
+SELECT *
+from sep_oct
+WHERE Trip_distance <= 0.1
+
+--- or
+
+select *
+from sep_oct
+where Trip_distance <= 0.1 or Trip_distance >= 15
+
+/* 16. We would like to see the distribution (not like histogram) of Total_amount. 
+Could you create buckets, or price range, for Total_amount and find how many trips there are in each buckets? 
+Each range would be 5, until 35, i.e. 0-5, 5-10, 10-15 … 30-35, +35. The expected output would be as follows: */
+
+
+
+
+
+
+
