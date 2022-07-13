@@ -91,3 +91,4 @@ Use September data for Q32 - Q35:
 Note: All these questions are very applicable in business life. Questions after Q32 would look harder (Yes, it is!), however they are essential in some business domains. For example, Netflix and Amazon Prime Video measure customer engagement. The way to find out more engaged customers is comparing each session duration, i.e. any time you log in, with previous/next session. This business problem is a version of Q33.
 How about measuring popularity of a movie? Calculate total minutes watched for each movie each day. Compare total minutes watched previous/next day for each movie. If a movie is attracting less viewer, i.e less minutes watched each day, then it is time to end the contract for this movie. This business question is a version of Q31, Q34 and Q35. 
 */
+
