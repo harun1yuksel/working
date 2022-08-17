@@ -1,0 +1,236 @@
+1. 1. What Are the Data Types Supported in Tableau?
+Tableau supports 7 types of data types String values, Date values, Date & Time values, Numeric values, Boolean values, Geographical values, Cluster or mixed values.
+
+String Data Type
+
+
+    String values are of two types:- Char and Varchar
+
+*Char Data Type
+The length of the string is pre-defined or fixed i.e. 
+
+*Varchar Data type
+Varchar stands for Variable character, The length of the string is variable
+ i.e. you can enter as many values as you want
+ 
+
+  Date and Date & Time Data Type;
+    
+    Tableau support all date formats like
+dd-mm-yy, dd-mm-yyyy, mm-dd-yyyy etc.
+
+Time data values can be Seconds, minutes, hours, days, months, years, decades etc.
+
+  Numeric Data Type;
+  
+    Numeric values can be either:- Integer or Floating
+Integer: 10, -5, 0
+Floating (decimal): 2.536, 0.6667, -3.14 
+
+Boolean Data Type;
+
+    Boolean data types have two logical values:- True or False.
+True and False are also represented by 1 and 0 respectively
+Example: “ Is profit greater than zero?”- “Yes” or “No”
+In the tableau, it becomes a boolean calculation:
+SUM([Profit]) > 0
+
+
+Geographical Data Type
+
+    Data values are used in Maps.  Associates each value in a field with latitude and longitude value
+Includes values such as postal code, region, city, state, country etc.
+
+
+Cluster or Mixed Data Types
+
+  Tableau is capable of identifying the data type but sometimes the data field doesn’t match the data type.
+Mix values create a problem while analyzing the data.
+
+2. How Will You Understand Dimensions and Measures?
+
+    When you connect to a data source, Tableau automatically assigns each field in the data source as a dimension or a measure. You can find these in the data pane which is split into two sections: dimensions at the top, and measures at the bottom.
+    Dimensions typically contain qualitative values (such as names, dates, or geographical data). And measures typically contain things you can measure, like numeric and quantitative values.
+
+3. What is Meant by ‘discrete’ and ‘continuous’ in Tableau?
+
+Continuous means "forming an unbroken whole, without interruption"; discrete means "individually separate and distinct." In Tableau, fields can be either continuous or discrete. When you drag a field from the Data pane to Columns or Rows, the values are continuous by default and Tableau creates an axis.
+
+Continuous is the default for aggregations, and will cause tableau to draw an axis to plot marks on. 
+Discrete will list each discrete value resulting from your calculation.
+
+Discrete data are counted as distinct and separate  values within a range. 
+Examples: customer name or row ID or State. 
+Discrete values are shown as blue pills on the shelves and blue icons in the data window.
+
+Continuous data roles are used to measure continuous data and can take on any value within a finite or infinite interval. Examples: unit price, time and profit or order quantity. 
+Continuous values are shown as green pills.
+
+4. There Are Three Customer Segments in the Superstore Dataset. What Percent of the Total Profits Are Associated with the Corporate Segment?
+
+Follow these steps:
+1-Consumer name or customer ID
+2-Double-click on the profit field under Measures. 
+3-Right-click on SUM (Profit) under marks card, 
+select Quick Table Calculation and click on Percent of the total.
+
+5.What Are the Different Joins in Tableau?
+
+A join in Tableau means combining columns from one or more tables in a relational database. It also creates a set that can be saved as a table, or it can be saved as it is.
+
+Inner join combines the table that contains values that has matches in both the table
+When a value doesn’t match across both the table, it dropped entirely
+
+Left join combines all the values from the left table and corresponding matches from the right table
+When the value in the left table doesn’t have a corresponding match in the right table, you will see a null value in the grid
+
+Right join combines all the values from the right table and corresponding matches from the left table
+When the value in the right table doesn’t have a corresponding match in the left table, you will see a null value in the grid
+
+Full outer join
+Full outer join combines all the values from both the tables
+When a value from either of the table doesn’t have a match with the other table, you will see a null value in the grid
+
+6. What is the Difference Between Joining and Blending?
+
+Data Joining: Combining the data between two or more tables or sheets within the same Data Source is Data Joining.In Data Joining, all the combined tables or sheets contains common set of Dimensions and Measures.
+
+Data Blending: Combining the data from two or more different sources is Data Blending. In Data Blending, each data source contains its own set of Dimensions and Measures.
+Data Blending is useful when there is a need to combine the data from variety of sources such as  Excel Files and others
+
+Interview Questions
+
+1. What are the key responsibilities of a data analyst?
+
+Designing and maintaining data systems and databases; this includes fixing coding errors and other data-related problems. Mining data from primary and secondary sources, then reorganizing said data in a format that can be easily read by either human or machine.
+
+Interpreting data, analyzing results using statistical techniques
+Developing and implementing data analyses, data collection systems and other strategies that optimize statistical efficiency and quality
+Acquiring data from primary or secondary data sources and maintaining databases
+
+2.Enlist and explain the steps of a Data Analytics project lifecycle?
+
+The Data analytic lifecycle is designed for Big Data problems and data science projects.
+
+If it is summerized step by step:
+Phase 1: Discovery –
+
+-The data science team learn and investigate the problem.
+-Develop context and understanding.
+-Come to know about data sources needed and available for the project.
+-The team formulates initial hypothesis that can be later tested with data.
+
+Phase 2: Data Preparation –
+
+Phase 3: Model Planning –
+
+-Team explores data to learn about relationships between variables and subsequently, selects key variables and the most suitable models.
+-In this phase, data science team develop data sets for training, testing, and production purposes.
+-Team builds and executes models based on the work done in the model planning phase.
+-Several tools commonly used for this phase are – Matlab, STASTICA
+
+Phase 4: Model Building –
+
+-Team develops datasets for testing, training, and production purposes.
+-Team also considers whether its existing tools will suffice for running the models or if they need more robust environment for executing models.
+-Free or open-source tools – Rand PL/R, Octave, WEKA.
+Commercial tools – Matlab , STASTICA.
+
+Phase 5: Communication Results –
+
+-After executing model team need to compare outcomes of modeling to criteria established for success and failure.
+-Team considers how best to articulate findings and outcomes to various team members and stakeholders, taking into account warning, assumptions.
+-Team should identify key findings, quantify business value, and develop narrative to summarize and convey findings to stakeholders.
+
+Phase 6: Operationalize –
+
+-The team communicates benefits of project more broadly and sets up pilot project to deploy work in controlled way before broadening the work to full enterprise of users.
+-This approach enables team to learn about performance and related constraints of the model in production environment on small scale  , and make adjustments before full deployment.
+-The team delivers final reports, briefings, codes.
+Free or open source tools – Octave, WEKA, SQL, MADlib.
+
+3. Name some of the best tools used for data analysis and data visualization?
+
+Data analysis is the process of working on data with the purpose of arranging it correctly, explaining it, making it presentable, and finding a conclusion from that data.
+It is done for finding useful information from data to make rational decisions.
+
+The main purpose of data analysis is interpretation, evaluation & organization of data and to make the data presentable.
+
+4. What are the different methods of data collection?
+
+1. Observation:
+-Observation method has occupied an important place in descriptive sociological research. 
+-It is the most significant and common technique of data collection. 
+-It is a method of research which deals with the external behaviour of persons in appropriate situations.
+
+-According to P.V. Young, “Observation is a systematic and deliberate study through eye, of spontaneous occurrences at the time they occur. 
+
+-The purpose of observation is to perceive the nature and extent of significant interrelated elements within complex social phenomena, culture patterns or human conduct”.
+
+-This definition focuses on two important points:
+
+Firstly, in observation the observer wants to explore the cause-effect relationships between facts of a phenomenon.
+
+Secondly, various facts are watched accurately, carefully and recorded by the observer.
+
+2. Interview:
+Interview as a technique of data collection is very popular and extensively used in every field of social research. 
+-The dynamics of interviewing, however, involves much more than an oral questionnaire.
+
+-Interview is relatively more flexible tool than any written inquiry form and permits explanation. 
+ 
+-The interview method as a verbal method is quite significant in securing data about all these aspects. In this method a researcher or an interviewer can interact with his respondents and know their inner feelings and reactions. 
+
+
+The objectives of the interviewer are to penetrate the outer and inner life of persons and to collect information pertaining to a wide range of their experiences in which the interviewee may wish to rehearse his past, define his present and canvass his future possibilities. These answers of the interviewees may not be only a response to a question but also a stimulus to progressive series of other relevant statements about social and personal phenomena.
+
+In similar fashion, W.J. Goode and P.K Hatt have observed that “interviewing is fundamentally a process of social interaction”. In the interview two persons are not merely present at the same place but also influence each other emotionally and intellectually.
+
+3. Schedule:
+Schedule is one of the very commonly used tools of data collection in scientific investigation. P.V. Young says “The schedule has been used for collection of personal preferences, social attitudes, beliefs, opinions, behaviour patterns, group practices and habits and much other data”. The increasing use of schedule is probably due to increased emphasis by social scientists on quantitative measurement of uniformly accumulated data.
+
+Schedule is very much similar to questionnaire and there is very little difference between the two so far as their construction is concerned. The main difference between these two is that whereas the schedule is used in direct interview on direct observation and in it the questions are asked and filled by the researcher himself, the questionnaire is generally mailed to the respondent, who fills it up and returns it to the researcher. Thus the main difference between them lies in the method of obtaining data.
+
+Goode and Hatt says, “Schedule is the name usually applied to a set of questions which are asked and filled by an interviewer in a face to face situation with other person”. Webster defines a schedule as “a formal list, a catalogue or inventory and may be a counting device, used in formal and standardized inquiries, the sole purpose of which is aiding in the collection of quantitative cross-sectional data”.
+
+The success of schedule largely depends on the efficiency and tactfulness of the interviewer rather than the quality of questions posed. Because the interviewer himself asks all the questions and fills the answers all by himself, here the quality of question has less significance.
+
+4. Questionnaire:
+Questionnaire provides the most speedy and simple technique of gathering data about groups of individuals scattered in a wide and extended field. In this method, a questionnaire form is sent usually by post to the persons concerned, with a request to answer the questions and return the questionnaire.
+
+According to Goode and Hatt “It is a device for securing answers to questions by using a form which the respondent fills in himself. According to GA. Lundberg “Fundamentally the questionnaire is a set of stimuli to which illiterate people are exposed in order to observe their verbal behaviour under these stimuli”.
+
+ 
+Often the term “questionnaire” and “schedule” are considered as synonyms. Technically, however, there is a difference between these two terms. A questionnaire consists of a set of questions printed or typed in a systematic order on a form or set of forms. These form or forms are usually sent by the post to the respondents who are expected to read and understand the questions and reply to them in writing in the spaces given for the purposes on the said form or forms. Here the respondents have to answer the questions on their own.
+
+On the other hand schedule is also a form or set of forms containing a number of questions. But here the researcher or field worker puts the question to the respondent in a face to face situation, clarifies their doubts, offers the necessary explanation and most significantly fills their answers in the relevant spaces provided for the purpose.
+
+Since the questionnaire is sent to a selected number of individuals, its scope is rather limited but within its limited scope it can prove to be the most effective means of eliciting information, provided that it is well formulated and the respondent fills it properly.
+
+A properly constructed and administered questionnaire may serve as a most appropriate and useful data gathering device.
+
+5. Projective Techniques:
+The psychologists and psychiatrists had first devised projective techniques for the diagnosis and treatment of patients afflicted by emotional disorders. Such techniques are adopted to present a comprehensive profile of the individual’s personality structure, his conflicts and complexes and his emotional needs. Adoption of such techniques is not an easy affair. It requires intensive specialized training.
+
+ 
+The stimuli applied in projective tests may arouse in the individuals, undergoing the tests, varieties of reaction. Hence, in projective tests the individual’s responses to the stimulus situation are not considerate at their face value because there are no ‘right’ or ‘wrong’ answers. Rather emphasis is laid on his perception or the meaning he attaches to it and the way in which the endeavors to manipulate it or organizes it.
+
+The purpose is never clearly indicated by the nature of the stimuli and the way of their presentation. This also does not provide the way of interpretation of the responses. Since the individual is not asked to describe about himself directly and since he is provided with stimulus in the form of a photograph or a picture or on ink- blot, etc., the responses to these stimuli are construed as the indicators of the individual’s own view of the world, his personality structure, his needs, tensions and anxieties etc., says Bell.
+
+6. Case Study Method:
+According to Biesanz and Biesenz “the case study is a form of qualitative analysis involving the very careful and complete observation of a person, a situation or an institution.” In the words of Goode and Hatt, “Case study is a way of organizing social data so as to preserve the unitary character of the social object being studied.” P.V. young defines case study as a method of exploring and analyzing the life of a social unit, be that a person, a family, an institution, cultural group or even entire community.”
+
+In the words of Giddings “the case under investigation may be one human individual only or only an episode in first life or it might conceivably be a Nation or an epoch of history.” Ruth Strong maintains that “the case history or study is a synthesis and interpretation of information about a person and his relationship to his environment collected by means of many techniques.”
+
+Shaw and Clifford hold that “case study method emphasizes the total situation or combination of factors, the description of the process or consequences of events in which behaviour occurs, the study of individual behaviour in its total setting and the analysis and comparison of cases leading to formulation of hypothesis.”
+
+5. How should a data analyst handle missing or null values?
+
+Missing values can be handled by deleting the rows or columns having null values. If columns have more than half of the rows as null then the entire column can be dropped. The rows which are having one or more columns values as null can also be dropped.
+
+
+
+
+
+
+
