@@ -168,7 +168,137 @@ where Trip_distance <= 0.1 or Trip_distance >= 15
 
 /* 16. We would like to see the distribution (not like histogram) of Total_amount. 
 Could you create buckets, or price range, for Total_amount and find how many trips there are in each buckets? 
-Each range would be 5, until 35, i.e. 0-5, 5-10, 10-15 … 30-35, +35. The expected output would be as follows: */
+Each range would be 5, until 35, i.e. 0-5, 5-10, 10-15 … 30-35, +35. The expected output would be as follows: 
+   
+   Payment_range            Trip_count
+     0-5                        47
+     10-15                      938
+     15-20                      214   etc.
+
+     */
+         
+SELECT *
+from sep_oct
+
+select *,
+case when Total_amount BETWEEN 0 and 5 then '0-5'
+     when Total_amount > 5  and Total_amount <= 10 then '6-10'
+    when Total_amount > 10  and Total_amount <= 15 then '11-15'
+    when Total_amount > 15  and Total_amount <= 20 then '16-20'
+    when Total_amount > 20  and Total_amount <= 25 then '21-25'
+    when Total_amount > 25  and Total_amount <= 30 then '26-30'
+    when Total_amount > 30  and Total_amount <= 35 then '31-35'
+    when Total_amount > 35 then '35+'
+    When Total_amount < 0 then 'negative_payment'
+    end as Payment_range
+from sep_oct
+
+
+with A as (
+    select
+case when Total_amount >= 0 and Total_amount <= 5 then '0-5'
+     when Total_amount > 5  and Total_amount <= 10 then '6-10'
+    when Total_amount > 10  and Total_amount <= 15 then '11-15'
+    when Total_amount > 15  and Total_amount <= 20 then '16-20'
+    when Total_amount > 20  and Total_amount <= 25 then '21-25'
+    when Total_amount > 25  and Total_amount <= 30 then '26-30'
+    when Total_amount > 30  and Total_amount <= 35 then '31-35'
+    when Total_amount > 35 then '35+'
+    When Total_amount < 0 then 'negative_payment'
+    end as Payment_range
+from sep_oct
+)
+select payment_range, COUNT(Payment_range) as trip_count
+from A 
+GROUP by (Payment_range)
+order by 1;
+
+/*     17. We also would like to analyze the performance of each driver’s earning. 
+Could you add driver_id to payment distribution table?  */
+
+with A as (
+    select *, 
+case when Total_amount >= 0 and Total_amount <= 5 then '0-5'
+     when Total_amount > 5  and Total_amount <= 10 then '6-10'
+     when Total_amount > 10  and Total_amount <= 15 then '11-15'
+     when Total_amount > 15  and Total_amount <= 20 then '16-20'
+     when Total_amount > 20  and Total_amount <= 25 then '21-25'
+     when Total_amount > 25  and Total_amount <= 30 then '26-30'
+     when Total_amount > 30  and Total_amount <= 35 then '31-35'
+     when Total_amount > 35 then '35+'
+     When Total_amount < 0 then 'negative_payment'
+     end as Payment_range
+from sep_oct
+)
+select  distinct driver_id, payment_range, 
+COUNT(Payment_range) over(PARTITION by driver_id, Payment_range) as driver_trip_count,
+Cast(sum(Total_amount) over(PARTITION by driver_id, payment_range) as Decimal (10,2)) as driver_earning_for_range,
+Cast((sum(Total_amount) over(PARTITION by driver_id)) as Decimal (10, 2)) as driver_earning_total
+from A 
+order by 1;
+
+/*    18. Could you find the highest 3 Total_amount trips for each driver? Hint: Use “Window” functions. */
+
+WITH A as (
+SELECT driver_id, Total_amount,
+ROW_NUMBER() OVER(partition by driver_id order by Total_amount desc) as row_num
+from sep_oct
+)
+SELECT *
+from A
+WHERE row_num <=3;
+
+WITH A as (
+SELECT *,
+ROW_NUMBER() OVER(partition by driver_id order by Total_amount desc) as row_num
+from sep_oct
+)
+SELECT *
+from A
+WHERE row_num <=3;
+
+/*    19. Could you find the lowest 3 Total_amount trips for each driver? Hint: Use “Window” functions. */
+
+WITH A as (
+SELECT *,
+ROW_NUMBER() OVER(partition by driver_id order by Total_amount Asc) as row_num
+from sep_oct
+)
+SELECT *
+from A
+WHERE row_num <=3;
+
+/*    20. Could you find the lowest 10 Total_amount trips for driver_id 1? 
+Do you see any anomaly in the rank? (same rank, missing rank etc). 
+Could you “fix” that so that ranking would be 1, 2, 3, 4… (without any missing rank)? 
+Note that 1 is the lowest Total_amount in this question. 
+Also, same ranks would continue to exist since there might be the same Total_amount. Hint: dense_rank. */
+
+WITH A as (
+SELECT *,
+ROW_NUMBER() OVER(partition by driver_id order by Total_amount Asc) as row_num
+from sep_oct
+)
+SELECT *
+from A
+WHERE row_num <=10 and driver_id = '1'
+
+/*    21. Our friend, driver_id 1, is very happy to see what we have done for her 
+(Yes, it is “her”. Her name is Gertrude Jeannette, https://en.wikipedia.org/wiki/Gertrude_Jeannette. That is why her id is 1). 
+Could you do her a favor and track her earning after each trip? */
+
+SELECT Total_amount,
+sum(Total_amount) OVER(order by lpep_pickup_datetime, unbounded preceding) as cumulative_sum
+from sep_oct
+WHERE driver_id = '1'
+
+
+
+
+
+
+
+
 
 
 

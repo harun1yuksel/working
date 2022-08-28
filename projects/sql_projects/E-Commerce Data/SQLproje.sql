@@ -126,28 +126,26 @@ Find the customer whose order took the maximum time to get delivered.
     ORDER by DaysTakenForDelivery DESC
 
 /*q5 
-Count the total number of unique customers in January and how many of them
+Count the total number of unique customers in January 2011 and how many of them
 came back every month over the entire year in 2011
 */
 
-SELECT distinct cust_id as cust_ordered_jan, order_date
+SELECT distinct cust_id as cust_ordered_jan2011
 FROM combined_table
-where MONTH(Order_Date) = 1 
-
-------
-SELECT distinct Cust_id, MONTH(order_date) as order_month
-from combined_table
+where MONTH(Order_Date) = 1 AND YEAR(Order_Date) = 2011
 
 with A as (
-    SELECT distinct Cust_id, MONTH(order_date) as order_month
-from combined_table
+    SELECT distinct cust_id as cust_ordered_jan2011
+    FROM combined_table
+    where MONTH(Order_Date) = 1 AND YEAR(Order_Date) = 2011
 )
 
-SELECT Cust_id, order_month,
-row_number() over(PARTITION by cust_id order by order_month) num_of_ordered_month
-from A
+SELECT distinct Cust_id as Cus_Jan_Feb_2011
+from A, combined_table B
+where A.cust_ordered_jan2011 = B.Cust_id AND MONTH(B.Order_Date) = 2 AND YEAR(Order_Date) = 2011
 
-/* yukarıdaki tabloya göre her ay sipariş veren müşteri bulunamadı, yada ben bulamadım :) */ 
+------
+
 
 
 
