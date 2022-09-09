@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "vs_studies"
+		},
+		{
+			"path": "../Downloads/rehabilitation-yoga"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "vs_studies"
+	}
+}
