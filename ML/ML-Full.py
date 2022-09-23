@@ -118,7 +118,7 @@
 #y->dependent variable 
 #x1..Xn -->independent variables 
 
-#Regression Error Method:
+#Regression Error Metriks:
 
 #1)Mean Absulate Error(MAE):
 #    1/nΣ =|yi-yi^|
@@ -1700,8 +1700,8 @@ eval_metric(y_train, y_train_over)
     
 # Scaling yapmakta fayda var yapmazsak performance düşebilir
 # 2 türlü scaling var.
-# Deviation =1, mean=0 olacak şekilde veriyi dönüştürüyor
-# Değerler 0-1 arasında olacak şekilde veriyi dönüştürüyor
+# Deviation =1, mean=0 olacak şekilde veriyi dönüştürüyor = standart scaling (z score normalization, genellikle(-3, 3))
+# Değerler 0-1 arasında olacak şekilde veriyi dönüştürüyor =
 
 # NOT:class chatteki bir soru: label(Target/Bağımlı) degere(değişkene) scaling yapilimiyor?
 # Orion Hoca: ML de label kutsal. mümkünse dokunmuyoruz    
@@ -2806,7 +2806,8 @@ X_test.head()
 
 ################# OneHotEncoder
 # Tüm dataya get_dummy yapılırsa data leakage oluyor. O yüzden ayrı ayrı get_dummy yapıyoruz
-# Önce tüm dataya ait dataya yapılırsa. Test datası train datasındaki verileri(kendinde olmayan sütunları) görmüş olduğu için yalancı bir iyileşme oluyor
+# Önce tüm dataya ait dataya yapılırsa. Test datası train datasındaki verileri(kendinde olmayan sütunları) görmüş olduğu için 
+# yalancı bir iyileşme oluyor
 # .. Yani sonuç olarak data leakage oluyor
 # Orion Hoca: her iki tarafta aynı feature gerçek hayatta olamayabiliri. bizimde bunu simüle etmemiz gerek
 # .. o yüzden direk tüm dataya herhangi bir encoding ML de uygulanmaz
@@ -2852,7 +2853,8 @@ pd.DataFrame(enc.transform(new_data[[0]]), columns = enc.get_feature_names(["0"]
     # get dummy pandas
     # one hot encoder =sklearn.
 # Class chat: one hot encoder ın get dummy den bir farkı var mı?
-    # Johnson Hoca: OneHotEncoder içindeki drop hyperparametresini none yerine drop olarak değiştirirseniz fazla feature ignore eder
+    # Johnson Hoca: OneHotEncoder içindeki drop hyperparametresini none yerine drop olarak değiştirirseniz
+    # fazla feature ignore eder
 
 cat = X_train.select_dtypes("object").columns
 cat
@@ -3544,8 +3546,7 @@ scores.iloc[:,2:].mean()
 #Logistic Regression ( Lojistik Regresyon ) sınıflandırma 
 #işlemi yapmaya yarayan bir regresyon yöntemidir.
 #Kategorik veya sayısal verilerin sınıflandırılmasında
-#kullanılır. Bağımlı değişkenin yani sonucun sadece
-#2 farklı değer alabilmesi durumda çalışır. 
+#kullanılır. Bağımlı değişkenin yani sonucun sadece kategorik veri olması durumunda çalışır. 
 #( Evet / Hayır, Erkek / Kadın, Şişman / Zayıf vs. )
 
 
@@ -3555,7 +3556,7 @@ scores.iloc[:,2:].mean()
 #Regression deyince anladığımız continious değerdi ama 
 #logistic regression classification yapar 
 
-#log:eksi sonsuz ile artı sonsuz arasındaki sayıları 0 ile 1 arasında 
+#log model:eksi sonsuz ile artı sonsuz arasındaki sayıları 0 ile 1 arasında 
 #sıkıştırır 
 
 # p|     . . . . .   o ->0
