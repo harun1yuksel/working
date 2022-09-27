@@ -4832,8 +4832,8 @@ model = LogisticRegression()
 #class_weight : Class sayıları arasında dengesizlik varsa; sayısı az olan 
 #sınıfı daha çok ağırlıklandırır. Yani zayıf olan sınıfa daha çok tahmin yaptırır.
 #solver : Modeller metricleri minimize etmek için 'Gradient Descent tabanlı' 
-#çalışırlar. Solver metrikleri de Gradient Descent methodlarıdır. Çok bilinmiyorsa d
-#efault değerlerinin değiştirilmesi önerilmez. Çoğunlukla default değeri 
+#çalışırlar. Solver metrikleri de Gradient Descent methodlarıdır. 
+#Çok bilinmiyorsa default değerlerinin değiştirilmesi önerilmez. Çoğunlukla default değeri 
 #iyi sonuç verir. (solver : 'lbfgs')
 #Eğer data küçükse ''solver : liblinear'', çok büyük datalarda ise ''solver : sag'' 
 #veya ''solver : saga'' iyi bir seçim olabilir. Kafamızda soru işareti oluştuğu 
@@ -8442,7 +8442,7 @@ pipe_model.predict(df_samples)
 #2-Featurelar arasında da seçim yapılır,hepsi alınmaz.
 #"Verdiğim featurelar arasından şu kadar feature al" denir.Her seferinde farklı 
 #featurelar seçtiği için bütün ağaçlar birbirinden farklı olur 
-#Böylece he giren data değişir he de datanın üzerinde çalışacağı featurelar değişir
+#Böylece hem giren data değişir hem de datanın üzerinde çalışacağı featurelar değişir
 #Bütün ağaçların Root Node ları farklı olur.Bu şekilde Decision Tree nin sona kadar 
 #gitesini engellemiş oluyoruz(Variance sona kadar gitmez)
 #Sonrasında bütün subsamplelar birer prediction yapar ver bunların ortalaması alınır 

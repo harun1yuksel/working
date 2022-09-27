@@ -9,7 +9,7 @@ st.markdown('### The model is trained with the cars that has listed below. If yo
 
 st.info("'Audi A1', 'Audi A3', 'Opel Astra', 'Opel Corsa', 'Opel Insignia', 'Renault Clio', 'Renault Duster', 'Renault Espace'")
 
-st.markdown("## Please entier the information of your car from the left side bar and below")
+st.markdown("## Please enter the information of your car from the left side bar and below")
 
 import pickle
 filename = 'autoScout_model.pkl'
