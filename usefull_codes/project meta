@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2022-12-27T08:59:34.988Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36" etag="BsapdxoaUD75LVYWGF3o" version="20.7.4" type="github">
+<mxfile host="app.diagrams.net" modified="2022-12-27T09:02:16.254Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36" etag="ADdLNXoMU3E1VwtviQ3z" version="20.7.4" type="github">
   <diagram id="7X9eAkSmEJcvoOUxnp1h" name="Page-1">
-    <mxGraphModel dx="860" dy="567" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="860" dy="474" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -183,7 +183,7 @@
           <mxGeometry x="316.25" y="822.5" width="135" height="175" as="geometry" />
         </mxCell>
         <mxCell id="MRY3kQANzTIBnYfLb_AC-45" value="&lt;b&gt;Grafikler&lt;/b&gt;&lt;br&gt;Observations&lt;br&gt;trend&lt;br&gt;Seasonality&lt;br&gt;Rezidüler&lt;br&gt;Predicted vs Observed" style="whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;rounded=1;" parent="1" vertex="1">
-          <mxGeometry x="580" y="817.5" width="135" height="170" as="geometry" />
+          <mxGeometry x="580" y="817.5" width="135" height="182.5" as="geometry" />
         </mxCell>
         <mxCell id="MRY3kQANzTIBnYfLb_AC-50" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="MRY3kQANzTIBnYfLb_AC-48" target="MRY3kQANzTIBnYfLb_AC-5" edge="1">
           <mxGeometry relative="1" as="geometry">
@@ -196,7 +196,7 @@
           <mxGeometry x="10" y="690" width="230" height="130" as="geometry" />
         </mxCell>
         <mxCell id="MRY3kQANzTIBnYfLb_AC-56" value="&lt;b&gt;BoxPlot&lt;/b&gt;" style="whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;rounded=1;" parent="1" vertex="1">
-          <mxGeometry x="470" y="822.5" width="67" height="172.5" as="geometry" />
+          <mxGeometry x="470" y="822.5" width="67" height="177.5" as="geometry" />
         </mxCell>
         <mxCell id="MRY3kQANzTIBnYfLb_AC-63" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
